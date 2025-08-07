@@ -7,23 +7,21 @@ import { RequirementsTable } from "./components/RequirementsTable";
 import type { ProjectModel } from "./models/project-model";
 import type { UserModel } from "./models/user-model.ts";
 
-//mocks
-import { projectsMock } from "./mock/projects-mock.ts"
+// mocks
+import { projectsMock } from "./mock/projects-mock.ts";
 import { usermock } from "./mock/user-mock.ts";
 import { SettingsPage } from "./pages/SettingsScreen.tsx";
 
+import { useStateMachine } from "./context/StateMachineContext"; // Importa el context
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showRequirements, setShowRequirements] = useState(true);
-  const [showFiles, setShowFiles] = useState(true);
   const [language, setLanguage] = useState("es");
   const [activeProject, setActiveProject] = useState("E-Commerce Platform");
   const navigate = useNavigate();
 
-
-  // NUEVO: Estados de colapso
+  // Estados de colapso
   const [isChatCollapsed, setIsChatCollapsed] = useState(false);
   const [isReqsCollapsed, setIsReqsCollapsed] = useState(false);
 
@@ -41,11 +39,9 @@ export default function App() {
   }, [isDarkMode]);
 
   const handleGenerateRequirements = () => {
-    setShowRequirements(true);
-    // Simulate AI analysis delay
-    setTimeout(() => {
-      // Requirements table will appear
-    }, 500);
+    // Aquí puedes cambiar el estado de la StateMachine si lo deseas
+    // Por ejemplo: setState("analyze_requisites");
+
   };
 
   const handleLogout = () => {
@@ -62,6 +58,19 @@ export default function App() {
     // Ambos abiertos: aplica basis según el main (chat) o no (tabla)
     return main ? "flex-1 min-h-0 basis-[70%]" : "flex-1 min-h-0 basis-[20%]";
   };
+
+  // === NUEVO: Estado global de la StateMachine ===
+  const { state: smState } = useStateMachine();
+
+  // Lógica de visibilidad
+  const showFiles =
+    smState === "software_questions" ||
+    smState === "new_requisites" ||
+    smState === "analyze_requisites" ||
+    smState === "stall";
+
+  const showRequirements =
+    smState !== "init" && smState !== "software_questions";
 
   return (
     <div className="h-screen flex flex-col bg-background text-foreground">
@@ -98,35 +107,38 @@ export default function App() {
       <main className="flex-1 min-h-0 flex flex-col gap-4 px-4 overflow-auto">
         <Routes>
           {/* Pantalla principal */}
-          <Route path="/" element={
-            <>
-              <div className={getPanelClass(isChatCollapsed, isReqsCollapsed, isChatCollapsed, true)}>
-                <ChatArea
-                  onGenerateRequirements={handleGenerateRequirements}
-                  showFiles={showFiles}
-                  collapsed={isChatCollapsed}
-                  onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
-                  language={language as "en" | "es" | "ca"}
-                />
-              </div>
-              {showRequirements && (
-                <div className={getPanelClass(isReqsCollapsed, isChatCollapsed, isReqsCollapsed, false)}>
-                  <RequirementsTable
-                    collapsed={isReqsCollapsed}
-                    onToggleCollapse={() => setIsReqsCollapsed((c) => !c)}
+          <Route
+            path="/"
+            element={
+              <>
+                <div className={getPanelClass(isChatCollapsed, isReqsCollapsed, isChatCollapsed, true)}>
+                  <ChatArea
+                    onGenerateRequirements={handleGenerateRequirements}
+                    showFiles={showFiles}
+                    collapsed={isChatCollapsed}
+                    onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
                     language={language as "en" | "es" | "ca"}
                   />
                 </div>
-              )}
-            </>
-          } />
+                {showRequirements && (
+                  <div className={getPanelClass(isReqsCollapsed, isChatCollapsed, isReqsCollapsed, false)}>
+                    <RequirementsTable
+                      collapsed={isReqsCollapsed}
+                      onToggleCollapse={() => setIsReqsCollapsed((c) => !c)}
+                      language={language as "en" | "es" | "ca"}
+                    />
+                  </div>
+                )}
+              </>
+            }
+          />
           {/* Ruta configuración */}
-          <Route path="/settings" element={
-            <SettingsPage user={user} onUpdate={() => { }} />
-          } />
+          <Route
+            path="/settings"
+            element={<SettingsPage user={user} onUpdate={() => { }} />}
+          />
         </Routes>
       </main>
-
     </div>
   );
 }
