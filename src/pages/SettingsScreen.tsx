@@ -2,65 +2,127 @@ import { useState } from "react";
 import { SettingsUserSection } from "../components/settings/SettingsUserSection";
 import { SettingsPreferencesSection } from "../components/settings/SettingsPreferencesSection";
 import { SettingsExampleFilesSection } from "../components/settings/SettingsExampleFilesSection";
-import { ArrowLeft } from "lucide-react";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import {
+  Box,
+  Paper,
+  Button,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import type { UserModel } from "../models/user-model";
+import { getTranslations, type Language } from "../i18n";
 
 interface SettingsPageProps {
   user: UserModel;
   onUpdate?: (user: UserModel) => void;
+  language: Language;
+  onLanguageChange: (lang: string) => void;
 }
 
-const SECTIONS = [
-  { id: "user", label: "Datos de Usuario" },
-  { id: "preferences", label: "Preferencias" },
-  { id: "exampleFiles", label: "Archivos de ejemplo" },
-];
-
-export function SettingsPage({ user, onUpdate }: SettingsPageProps) {
+export function SettingsPage({ user, onUpdate, language, onLanguageChange }: SettingsPageProps) {
   const [section, setSection] = useState("user");
   const navigate = useNavigate();
+  const t = getTranslations(language);
+
+  const SECTIONS = [
+    { id: "user", label: t.settingsSectionUser },
+    { id: "preferences", label: t.settingsSectionPreferences },
+    { id: "exampleFiles", label: t.settingsSectionExampleFiles },
+  ];
 
   return (
-    <div className="max-w-5xl mx-auto py-10 px-4 flex gap-10">
-      {/* Panel lateral */}
-      <aside className="w-56 flex-shrink-0">
-        <button
-          className="flex items-center gap-2 mb-8 text-muted-foreground hover:text-foreground transition"
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "flex-start",
+        width: "100%",
+        height: "100%",
+        minHeight: "60vh",
+      }}
+    >
+      {/* Sidebar permanente */}
+      <Paper
+        elevation={2}
+        sx={{
+          width: 240,
+          minWidth: 200,
+          maxWidth: 280,
+          height: "100vh",
+          borderRadius: 0,
+          p: 3,
+          pt: 4,
+          boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          position: "sticky",
+          top: 0,
+          bgcolor: "background.paper",
+        }}
+      >
+        <Button
+          variant="text"
+          startIcon={<ArrowBackIosNewIcon />}
           onClick={() => navigate("/")}
+          sx={{
+            mb: 3,
+            alignSelf: "flex-start",
+            color: "text.secondary",
+            textTransform: "none",
+            fontWeight: 500,
+          }}
         >
-          <ArrowLeft className="h-5 w-5" />
-          Volver
-        </button>
-        <nav className="flex flex-col gap-1">
-          {SECTIONS.map(s => (
-            <button
-              key={s.id}
-              className={`rounded px-4 py-2 text-left transition ${
-                section === s.id
-                  ? "bg-primary/10 text-primary font-semibold"
-                  : "hover:bg-muted"
-              }`}
-              onClick={() => setSection(s.id)}
-            >
-              {s.label}
-            </button>
+          {t.settingsBack}
+        </Button>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          {t.settingsTitle}
+        </Typography>
+        <List component="nav" sx={{ gap: 0.5, p: 0 }}>
+          {SECTIONS.map((s) => (
+            <ListItem key={s.id} disablePadding>
+              <ListItemButton
+                selected={section === s.id}
+                onClick={() => setSection(s.id)}
+                sx={{
+                  borderRadius: 1,
+                  fontWeight: section === s.id ? "bold" : "medium",
+                  bgcolor: section === s.id ? "action.selected" : "transparent",
+                  color: "inherit",
+                  mb: 0.5,
+                }}
+              >
+                <ListItemText primary={s.label} />
+              </ListItemButton>
+            </ListItem>
           ))}
-        </nav>
-      </aside>
-
+        </List>
+      </Paper>
       {/* Área de contenido */}
-      <section className="flex-1 min-w-0">
+      <Box flex={1} minWidth={0} px={{ xs: 2, sm: 5 }} py={4}>
         {section === "user" && (
-          <SettingsUserSection user={user} onUpdate={onUpdate} />
+          <SettingsUserSection user={user} onUpdate={onUpdate} language={language} />
         )}
         {section === "preferences" && (
-          <SettingsPreferencesSection user={user} onUpdate={onUpdate} />
+          <SettingsPreferencesSection
+            user={user}
+            onUpdate={onUpdate}
+            language={language}
+            onLanguageChange={onLanguageChange}
+          />
         )}
         {section === "exampleFiles" && (
-          <SettingsExampleFilesSection user={user} onUpdate={onUpdate} />
+          <SettingsExampleFilesSection
+            user={user}
+            onUpdate={onUpdate}
+            language={language}
+          />
         )}
-      </section>
-    </div>
+      </Box>
+    </Box>
   );
 }

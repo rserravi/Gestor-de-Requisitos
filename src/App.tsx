@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
+import Box from "@mui/material/Box";
 import { Header } from "./components/Header";
 import { SideMenu } from "./components/SideMenu";
 import { ChatArea } from "./components/ChatArea";
@@ -11,11 +12,14 @@ import type { UserModel } from "./models/user-model.ts";
 import { projectsMock } from "./mock/projects-mock.ts";
 import { usermock } from "./mock/user-mock.ts";
 import { SettingsPage } from "./pages/SettingsScreen.tsx";
+import { useStateMachine } from "./context/StateMachineContext";
 
-import { useStateMachine } from "./context/StateMachineContext"; // Importa el context
+interface AppProps {
+  isDarkMode: boolean;
+  onToggleDarkMode: () => void;
+}
 
-export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState("es");
   const [activeProject, setActiveProject] = useState("E-Commerce Platform");
@@ -29,37 +33,7 @@ export default function App() {
   const projects: ProjectModel[] = projectsMock;
   const user: UserModel = usermock;
 
-  // Handle dark mode
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
-
-  const handleGenerateRequirements = () => {
-    // Aquí puedes cambiar el estado de la StateMachine si lo deseas
-    // Por ejemplo: setState("analyze_requisites");
-
-  };
-
-  const handleLogout = () => {
-    // Handle logout logic here
-    console.log("Logging out...");
-    setIsMenuOpen(false);
-  };
-
-  // CLASES dinámicas para cada panel
-  const getPanelClass = (collapsedA: boolean, collapsedB: boolean, thisCollapsed: boolean, main = false) => {
-    if (collapsedA && collapsedB) return "h-auto";
-    if (thisCollapsed) return "h-auto";
-    if (collapsedA || collapsedB) return "flex-1 min-h-0";
-    // Ambos abiertos: aplica basis según el main (chat) o no (tabla)
-    return main ? "flex-1 min-h-0 basis-[70%]" : "flex-1 min-h-0 basis-[20%]";
-  };
-
-  // === NUEVO: Estado global de la StateMachine ===
+  // === StateMachine global ===
   const { state: smState } = useStateMachine();
 
   // Lógica de visibilidad
@@ -73,12 +47,12 @@ export default function App() {
     smState !== "init" && smState !== "software_questions";
 
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground">
+    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default", color: "text.primary" }}>
       {/* Header */}
       <Header
         activeProject={activeProject}
         isDarkMode={isDarkMode}
-        onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+        onToggleDarkMode={onToggleDarkMode}
         onToggleMenu={() => setIsMenuOpen(true)}
         language={language}
         onLanguageChange={setLanguage}
@@ -99,46 +73,69 @@ export default function App() {
           navigate("/settings");
         }}
         user={user}
-        onLogout={handleLogout}
+        onLogout={() => setIsMenuOpen(false)}
         language={language as "en" | "es" | "ca"}
       />
 
       {/* Main Content */}
-      <main className="flex-1 min-h-0 flex flex-col gap-4 px-4 overflow-auto">
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          px: { xs: 1, sm: 3 },
+          pt: { xs: 7, sm: 8 },
+          pb: 2,
+          overflowY: "auto",
+          overflowX: "hidden"
+        }}
+      >
         <Routes>
-          {/* Pantalla principal */}
           <Route
             path="/"
             element={
-              <>
-                <div className={getPanelClass(isChatCollapsed, isReqsCollapsed, isChatCollapsed, true)}>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minHeight: 0 }}>
+                {/* ChatArea: nunca más del 70% vertical */}
+                <Box sx={{ flexShrink: 0, minHeight: 0 }}>
                   <ChatArea
-                    onGenerateRequirements={handleGenerateRequirements}
+                    onGenerateRequirements={() => { }}
                     showFiles={showFiles}
                     collapsed={isChatCollapsed}
                     onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
                     language={language as "en" | "es" | "ca"}
                   />
-                </div>
+                </Box>
+                {/* RequirementsTable ocupa el resto, con scroll propio */}
                 {showRequirements && (
-                  <div className={getPanelClass(isReqsCollapsed, isChatCollapsed, isReqsCollapsed, false)}>
+                  <Box sx={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
+
                     <RequirementsTable
                       collapsed={isReqsCollapsed}
                       onToggleCollapse={() => setIsReqsCollapsed((c) => !c)}
                       language={language as "en" | "es" | "ca"}
                     />
-                  </div>
+                  </Box>
                 )}
-              </>
+              </Box>
             }
           />
           {/* Ruta configuración */}
           <Route
             path="/settings"
-            element={<SettingsPage user={user} onUpdate={() => { }} />}
+            element={
+              <SettingsPage
+                user={user}
+                onUpdate={() => {}}
+                language={language as "en" | "es" | "ca"}
+                onLanguageChange={setLanguage}
+              />
+            }
           />
         </Routes>
-      </main>
-    </div>
+      </Box>
+    </Box>
   );
 }

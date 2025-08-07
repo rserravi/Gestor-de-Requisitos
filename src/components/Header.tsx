@@ -1,7 +1,12 @@
-import { Menu, Sun, Moon, Globe } from "lucide-react";
-import { Button } from "./ui/button";
-import { Switch } from "./ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Switch from "@mui/material/Switch";
+import { Menu as MenuIcon, Brightness7, Brightness4, Language as LanguageIcon } from "@mui/icons-material";
 import { getTranslations, type Language } from "../i18n";
 
 interface HeaderProps {
@@ -24,36 +29,66 @@ export function Header({
   const t = getTranslations(language as Language);
 
   return (
-    <header className="flex items-center justify-between px-4 py-3 bg-card border-b border-border">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={onToggleMenu} title={t.toggleMenu}>
-          <Menu className="h-5 w-5" />
-        </Button>
-        <h1 className="text-lg font-medium">{t.headerTitle.replace('{activeProject}', activeProject)}</h1>
-      </div>
+    <AppBar
+      position="fixed"
+      color="default"
+      elevation={1}
+      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+    >
+      <Toolbar>
+        {/* Botón menú lateral */}
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label={t.toggleMenu || "Abrir menú"}
+          onClick={onToggleMenu}
+          sx={{ mr: 2 }}
+        >
+          <MenuIcon />
+        </IconButton>
 
-      <div className="flex items-center gap-4">
-        <Select value={language} onValueChange={onLanguageChange}>
-          <SelectTrigger className="w-32" title={t.selectLanguage}>
-            <Globe className="h-4 w-4 mr-2" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="es">Español</SelectItem>
-            <SelectItem value="ca">Català</SelectItem>
-          </SelectContent>
-        </Select>
+        {/* Título / Proyecto activo */}
+        <Typography
+          variant="h6"
+          noWrap
+          component="div"
+          sx={{ flexGrow: 1 }}
+        >
+          {t.headerTitle
+            ? t.headerTitle.replace("{activeProject}", activeProject)
+            : activeProject}
+        </Typography>
 
-        <div className="flex items-center gap-2" title="Toggle dark/light theme">
-          <Sun className="h-4 w-4" />
+        {/* Selector de idioma */}
+        <Box sx={{ minWidth: 120, mr: 2, display: "flex", alignItems: "center" }}>
+          <LanguageIcon sx={{ mr: 1 }} fontSize="small" />
+          <Select
+            value={language}
+            onChange={(e) => onLanguageChange(e.target.value as string)}
+            size="small"
+            variant="standard"
+            disableUnderline
+            sx={{ fontWeight: 500, minWidth: 70 }}
+            title={t.selectLanguage || "Seleccionar idioma"}
+          >
+            <MenuItem value="en">English</MenuItem>
+            <MenuItem value="es">Español</MenuItem>
+            <MenuItem value="ca">Català</MenuItem>
+          </Select>
+        </Box>
+
+        {/* Switch modo claro/oscuro */}
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Brightness7 sx={{ mr: 1 }} />
           <Switch
             checked={isDarkMode}
-            onCheckedChange={onToggleDarkMode}
+            onChange={onToggleDarkMode}
+            color="primary"
+            inputProps={{ "aria-label": "toggle dark/light mode" }}
           />
-          <Moon className="h-4 w-4" />
-        </div>
-      </div>
-    </header>
+          <Brightness4 sx={{ ml: 1 }} />
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }

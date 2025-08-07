@@ -1,82 +1,117 @@
 import { useState } from "react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
-import { Switch } from "../ui/switch";
-import { Input } from "../ui/input";
+import {
+  Box,
+  Typography,
+  Stack,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Switch,
+  FormControlLabel,
+  TextField
+} from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
 import type { UserModel } from "../../models/user-model";
+import { getTranslations, type Language } from "../../i18n";
 
 interface SettingsPreferencesSectionProps {
   user: UserModel;
   onUpdate?: (user: UserModel) => void;
+  language: Language;
+  onLanguageChange: (lang: string) => void;
 }
 
-export function SettingsPreferencesSection({ user, onUpdate }: SettingsPreferencesSectionProps) {
-  // Estados locales para edición (mock)
-  const [language, setLanguage] = useState(user.preferences.language);
+export function SettingsPreferencesSection({ user, onUpdate, language, onLanguageChange }: SettingsPreferencesSectionProps) {
   const [theme, setTheme] = useState(user.preferences.theme);
   const [timezone, setTimezone] = useState(user.preferences.timezone);
   const [notifications, setNotifications] = useState(user.preferences.notifications);
+  const [isSaving, setIsSaving] = useState(false);
+  const t = getTranslations(language);
 
-  // Ejemplo de guardar cambios (simulado)
-  const handleSave = () => {
-    if (onUpdate) {
-      onUpdate({
-        ...user,
-        preferences: {
-          language,
-          theme,
-          timezone,
-          notifications,
-        },
-      });
-    }
-    // feedback visual...
+  // Comprobar cambios para habilitar botón
+  const hasChanges =
+    language !== user.preferences.language ||
+    theme !== user.preferences.theme ||
+    timezone !== user.preferences.timezone ||
+    notifications !== user.preferences.notifications;
+
+  const handleSave = async () => {
+    if (!onUpdate) return;
+    setIsSaving(true);
+    await Promise.resolve(); // simula async
+    onUpdate({
+      ...user,
+      preferences: { language, theme, timezone, notifications }
+    });
+    setIsSaving(false);
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold mb-4">Preferencias</h2>
-      <div className="space-y-4 max-w-md">
-        <label className="block mb-1">
-          Idioma
-          <Select value={language} onValueChange={setLanguage}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="es">Español</SelectItem>
-              <SelectItem value="en">English</SelectItem>
-              <SelectItem value="ca">Català</SelectItem>
-            </SelectContent>
+    <Box sx={{ maxWidth: 420 }}>
+      <Typography variant="h5" fontWeight="bold" mb={3}>
+        {t.settingsPrefsTitle}
+      </Typography>
+      <Stack spacing={3}>
+        <FormControl fullWidth size="small">
+          <InputLabel id="language-label">{t.settingsPrefsLangLabel}</InputLabel>
+          <Select
+            labelId="language-label"
+            value={language}
+            label={t.settingsPrefsLangLabel}
+            onChange={e => onLanguageChange(e.target.value)}
+          >
+            <MenuItem value="es">Español</MenuItem>
+            <MenuItem value="en">English</MenuItem>
+            <MenuItem value="ca">Català</MenuItem>
           </Select>
-        </label>
-        <label className="block mb-1">
-          Tema
-          <Select value={theme} onValueChange={setTheme}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">Claro</SelectItem>
-              <SelectItem value="dark">Oscuro</SelectItem>
-              <SelectItem value="auto">Automático</SelectItem>
-            </SelectContent>
+        </FormControl>
+
+        <FormControl fullWidth size="small">
+          <InputLabel id="theme-label">{t.settingsPrefsThemeLabel}</InputLabel>
+          <Select
+            labelId="theme-label"
+            value={theme}
+            label={t.settingsPrefsThemeLabel}
+            onChange={e => setTheme(e.target.value)}
+          >
+            <MenuItem value="light">{t.settingsPrefsThemeLight}</MenuItem>
+            <MenuItem value="dark">{t.settingsPrefsThemeDark}</MenuItem>
+            <MenuItem value="auto">{t.settingsPrefsThemeAuto}</MenuItem>
           </Select>
-        </label>
-        <label className="block mb-1">
-          Zona horaria
-          <Input value={timezone} onChange={e => setTimezone(e.target.value)} />
-        </label>
-        <div className="flex items-center gap-2 mt-2">
-          <label>Notificaciones</label>
-          <Switch checked={notifications} onCheckedChange={setNotifications} />
-        </div>
-        <button
-          className="mt-4 bg-primary text-primary-foreground px-4 py-2 rounded"
-          onClick={handleSave}
-        >
-          Guardar cambios
-        </button>
-      </div>
-    </div>
+        </FormControl>
+
+        <TextField
+          label={t.settingsPrefsTimezoneLabel}
+          value={timezone}
+          onChange={e => setTimezone(e.target.value)}
+          size="small"
+          fullWidth
+        />
+
+        <FormControlLabel
+          control={
+            <Switch
+              checked={notifications}
+              onChange={e => setNotifications(e.target.checked)}
+              color="primary"
+            />
+          }
+          label={t.settingsPrefsNotificationsLabel}
+        />
+
+        <Stack direction="row" justifyContent="flex-end">
+          <Button
+            variant="contained"
+            startIcon={<SaveIcon />}
+            disabled={!hasChanges || isSaving}
+            onClick={handleSave}
+          >
+            {isSaving ? t.settingsUserSaving : t.settingsPrefsSave}
+          </Button>
+        </Stack>
+      </Stack>
+    </Box>
   );
 }

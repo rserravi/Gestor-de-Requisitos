@@ -80,6 +80,41 @@ const translations: Record<Language, Translations> = {
     headerTitle: "Requirements Manager - {activeProject}",
     toggleMenu: "Toggle menu",
     selectLanguage: "Select language",
+
+    // Settings Page
+    settingsTitle: "Settings",
+    settingsBack: "Back",
+    settingsSectionUser: "User Data",
+    settingsSectionPreferences: "Preferences",
+    settingsSectionExampleFiles: "Example Files",
+
+    // Settings - User Section
+    settingsUserTitle: "User Data",
+    settingsUserUpload: "Upload Image",
+    settingsUserName: "Name",
+    settingsUserEmail: "Email",
+    settingsUserSaving: "Saving...",
+    settingsUserSave: "Save",
+
+    // Settings - Preferences Section
+    settingsPrefsTitle: "Preferences",
+    settingsPrefsLangLabel: "Language",
+    settingsPrefsThemeLabel: "Theme",
+    settingsPrefsThemeLight: "Light",
+    settingsPrefsThemeDark: "Dark",
+    settingsPrefsThemeAuto: "System",
+    settingsPrefsTimezoneLabel: "Timezone",
+    settingsPrefsNotificationsLabel: "Notifications",
+    settingsPrefsSave: "Save changes",
+
+    // Settings - Example Files Section
+    settingsFilesTitle: "Example Files",
+    settingsFilesCount: "{count}/5",
+    settingsFilesDescription: "Place files with your requirement preferences here. Create a txt file with example requirements, one on each line. Organize them by clients or projects that have different requirement formulas. Mark the one you use most as a favorite.",
+    settingsFilesNoFiles: "No example files uploaded yet.",
+    settingsFilesMarkFavorite: "Mark as favorite",
+    settingsFilesDelete: "Delete",
+    settingsFilesUploadNew: "Upload new file",
   },
   es: {
     // ChatArea
@@ -156,6 +191,41 @@ const translations: Record<Language, Translations> = {
     headerTitle: "Gestor de Requisitos - {activeProject}",
     toggleMenu: "Abrir/cerrar menú",
     selectLanguage: "Seleccionar idioma",
+
+    // Settings Page
+    settingsTitle: "Configuración",
+    settingsBack: "Volver",
+    settingsSectionUser: "Datos de Usuario",
+    settingsSectionPreferences: "Preferencias",
+    settingsSectionExampleFiles: "Archivos de Ejemplo",
+
+    // Settings - User Section
+    settingsUserTitle: "Datos de Usuario",
+    settingsUserUpload: "Subir Imagen",
+    settingsUserName: "Nombre",
+    settingsUserEmail: "Correo electrónico",
+    settingsUserSaving: "Guardando...",
+    settingsUserSave: "Guardar",
+
+    // Settings - Preferences Section
+    settingsPrefsTitle: "Preferencias",
+    settingsPrefsLangLabel: "Idioma",
+    settingsPrefsThemeLabel: "Tema",
+    settingsPrefsThemeLight: "Claro",
+    settingsPrefsThemeDark: "Oscuro",
+    settingsPrefsThemeAuto: "Sistema",
+    settingsPrefsTimezoneLabel: "Zona Horaria",
+    settingsPrefsNotificationsLabel: "Notificaciones",
+    settingsPrefsSave: "Guardar cambios",
+
+    // Settings - Example Files Section
+    settingsFilesTitle: "Archivos de Ejemplo",
+    settingsFilesCount: "{count}/5",
+    settingsFilesDescription: "Coloca aquí archivos con tus preferencias de requisitos. Crea un archivo txt con requisitos de ejemplo, uno en cada línea. Organízalos por clientes o proyectos que tengan diferentes fórmulas de requisito. Marca como favorito el que más uses.",
+    settingsFilesNoFiles: "No hay archivos de ejemplo subidos aún.",
+    settingsFilesMarkFavorite: "Marcar como favorito",
+    settingsFilesDelete: "Eliminar",
+    settingsFilesUploadNew: "Subir nuevo archivo",
   },
   ca: {
     // ChatArea
@@ -232,6 +302,41 @@ const translations: Record<Language, Translations> = {
     headerTitle: "Gestor de Requisits - {activeProject}",
     toggleMenu: "Obrir/tancar menú",
     selectLanguage: "Seleccionar idioma",
+
+    // Settings Page
+    settingsTitle: "Configuració",
+    settingsBack: "Tornar",
+    settingsSectionUser: "Dades d'Usuari",
+    settingsSectionPreferences: "Preferències",
+    settingsSectionExampleFiles: "Fitxers d'Exemple",
+
+    // Settings - User Section
+    settingsUserTitle: "Dades d'Usuari",
+    settingsUserUpload: "Pujar Imatge",
+    settingsUserName: "Nom",
+    settingsUserEmail: "Correu electrònic",
+    settingsUserSaving: "Desant...",
+    settingsUserSave: "Desar",
+
+    // Settings - Preferences Section
+    settingsPrefsTitle: "Preferències",
+    settingsPrefsLangLabel: "Idioma",
+    settingsPrefsThemeLabel: "Tema",
+    settingsPrefsThemeLight: "Clar",
+    settingsPrefsThemeDark: "Fosc",
+    settingsPrefsThemeAuto: "Sistema",
+    settingsPrefsTimezoneLabel: "Zona Horària",
+    settingsPrefsNotificationsLabel: "Notificacions",
+    settingsPrefsSave: "Desar canvis",
+
+    // Settings - Example Files Section
+    settingsFilesTitle: "Fitxers d'Exemple",
+    settingsFilesCount: "{count}/5",
+    settingsFilesDescription: "Col·loca aquí fitxers amb les teves preferències de requisits. Crea un fitxer txt amb requisits d'exemple, un a cada línia. Organitza'ls per clients o projectes que tinguin diferents fórmules de requisit. Marca com a favorit el que més facis servir.",
+    settingsFilesNoFiles: "Encara no s'han pujat fitxers d'exemple.",
+    settingsFilesMarkFavorite: "Marcar com a favorit",
+    settingsFilesDelete: "Eliminar",
+    settingsFilesUploadNew: "Pujar nou fitxer",
   },
 };
 
