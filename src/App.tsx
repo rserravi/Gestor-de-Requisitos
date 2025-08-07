@@ -1,8 +1,17 @@
 import { useState, useEffect } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { Header } from "./components/Header";
 import { SideMenu } from "./components/SideMenu";
 import { ChatArea } from "./components/ChatArea";
 import { RequirementsTable } from "./components/RequirementsTable";
+import type { ProjectModel } from "./models/project-model";
+import type { UserModel } from "./models/user-model.ts";
+
+//mocks
+import { projectsMock } from "./mock/projects-mock.ts"
+import { usermock } from "./mock/user-mock.ts";
+import { SettingsPage } from "./pages/SettingsScreen.tsx";
+
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -11,22 +20,16 @@ export default function App() {
   const [showFiles, setShowFiles] = useState(true);
   const [language, setLanguage] = useState("es");
   const [activeProject, setActiveProject] = useState("E-Commerce Platform");
+  const navigate = useNavigate();
+
 
   // NUEVO: Estados de colapso
   const [isChatCollapsed, setIsChatCollapsed] = useState(false);
   const [isReqsCollapsed, setIsReqsCollapsed] = useState(false);
 
-  const projects = [
-    "E-Commerce Platform",
-    "Mobile Banking App",
-    "Healthcare Portal",
-    "Inventory Management"
-  ];
-
-  const user = {
-    name: "Sarah Wilson",
-    email: "sarah.wilson@company.com"
-  };
+  // Mocks
+  const projects: ProjectModel[] = projectsMock;
+  const user: UserModel = usermock;
 
   // Handle dark mode
   useEffect(() => {
@@ -79,8 +82,12 @@ export default function App() {
         projects={projects}
         activeProject={activeProject}
         onProjectChange={(project) => {
-          setActiveProject(project);
+          setActiveProject(project.name);
           setIsMenuOpen(false);
+        }}
+        onSettings={() => {
+          setIsMenuOpen(false);
+          navigate("/settings");
         }}
         user={user}
         onLogout={handleLogout}
@@ -88,33 +95,38 @@ export default function App() {
       />
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-h-0 gap-4 px-4">
-        {/* Chat Area */}
-        <div
-          className={getPanelClass(isChatCollapsed, isReqsCollapsed, isChatCollapsed, true)}
-        >
-          <ChatArea
-            onGenerateRequirements={handleGenerateRequirements}
-            showFiles={showFiles}
-            collapsed={isChatCollapsed}
-            onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
-            language={language as "en" | "es" | "ca"}
-          />
-        </div>
-
-        {/* Requirements Table */}
-        {showRequirements && (
-          <div
-            className={getPanelClass(isReqsCollapsed, isChatCollapsed, isReqsCollapsed, false)}
-          >
-            <RequirementsTable
-              collapsed={isReqsCollapsed}
-              onToggleCollapse={() => setIsReqsCollapsed((c) => !c)}
-              language={language as "en" | "es" | "ca"}
-            />
-          </div>
-        )}
+      <main className="flex-1 min-h-0 flex flex-col gap-4 px-4 overflow-auto">
+        <Routes>
+          {/* Pantalla principal */}
+          <Route path="/" element={
+            <>
+              <div className={getPanelClass(isChatCollapsed, isReqsCollapsed, isChatCollapsed, true)}>
+                <ChatArea
+                  onGenerateRequirements={handleGenerateRequirements}
+                  showFiles={showFiles}
+                  collapsed={isChatCollapsed}
+                  onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
+                  language={language as "en" | "es" | "ca"}
+                />
+              </div>
+              {showRequirements && (
+                <div className={getPanelClass(isReqsCollapsed, isChatCollapsed, isReqsCollapsed, false)}>
+                  <RequirementsTable
+                    collapsed={isReqsCollapsed}
+                    onToggleCollapse={() => setIsReqsCollapsed((c) => !c)}
+                    language={language as "en" | "es" | "ca"}
+                  />
+                </div>
+              )}
+            </>
+          } />
+          {/* Ruta configuración */}
+          <Route path="/settings" element={
+            <SettingsPage user={user} onUpdate={() => { }} />
+          } />
+        </Routes>
       </main>
+
     </div>
   );
 }

@@ -146,9 +146,9 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language }: Req
   };
 
   return (
-    <Card className={`border border-border rounded-lg bg-card transition-all duration-200 ${collapsed ? "h-auto" : "h-full"}`}>
+    <Card className={`rounded-lg bg-card transition-all duration-200 ${collapsed ? "h-auto" : "h-full"}`}>
       {/* Header igual que ChatArea */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted rounded-t-lg">
+      <div className="flex items-center justify-between px-4 py-2 bg-muted rounded-t-lg">
         <span className="font-bold text-lg flex items-center gap-2">
           <TableIcon className="h-5 w-5" />
           {t.requirementsTableTitle}
