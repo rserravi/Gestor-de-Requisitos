@@ -5,7 +5,6 @@ import {
 import {
   Send as SendIcon,
   UploadFile as UploadIcon,
-  InsertDriveFile as FileTextIcon,
   AutoAwesome as SparklesIcon,
   Close as CloseIcon,
   ExpandLess,
@@ -21,7 +20,7 @@ interface ChatAreaProps {
   collapsed: boolean;
   onToggleCollapse: () => void;
   language: Language;
-  projectId: number; // Opcional, si necesitas el ID del proyecto
+  projectId: number;
 }
 
 export function ChatArea({
@@ -33,10 +32,17 @@ export function ChatArea({
   projectId
 }: ChatAreaProps) {
   const t = getTranslations(language);
-  const [messages, setMessages] = useState<MessageModel[]>(messageMock as MessageModel[]); // Mock inicial
+  const [messages, setMessages] = useState<MessageModel[]>(messageMock as MessageModel[]);
   const [inputValue, setInputValue] = useState("");
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Mock de archivos de configuración subidos
+  const uploadedConfigFilesMock = [
+    { id: 1, name: "requisitos_api.docx" },
+    { id: 2, name: "ejemplo_requisitos.md" }
+  ];
+  const [selectedConfigFile, setSelectedConfigFile] = useState<number | "">("");
+  const [exampleRequirementsText, setExampleRequirementsText] = useState<string>("");
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -46,34 +52,25 @@ export function ChatArea({
       content: inputValue,
       sender: 'user',
       timestamp: new Date(),
-      state: "init", // Puedes ajustar el estado según tu lógica
+      state: "init",
       project_id: projectId
     };
 
     setMessages(prev => [...prev, newMessage]);
     setInputValue("");
 
-    // Simulate AI response
+    // Simula respuesta de la IA
     setTimeout(() => {
       const aiResponse: MessageModel = {
         id: (Date.now() + 1).toString(),
         content: t.aiResponseMessage,
         sender: 'ai',
         timestamp: new Date(),
-        state: "init", // Puedes ajustar el estado según tu lógica
+        state: "init",
         project_id: projectId
       };
       setMessages(prev => [...prev, aiResponse]);
     }, 1000);
-  };
-
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files || []);
-    setUploadedFiles(prev => [...prev, ...files]);
-  };
-
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -84,8 +81,12 @@ export function ChatArea({
   };
 
   return (
-    <Paper elevation={3} sx={{ borderRadius: 2, mb: 1, p: 0, display: "flex", flexDirection: "column", height: collapsed ? "auto" : "100%" }}>
-      {/* Header: siempre visible */}
+    <Paper elevation={3} sx={{
+      borderRadius: 2, mb: 1, p: 0,
+      display: "flex", flexDirection: "column",
+      height: collapsed ? "auto" : "100%"
+    }}>
+      {/* Header */}
       <Box display="flex" alignItems="center" justifyContent="space-between" px={2} py={1.5} sx={{
         bgcolor: "background.paper",
         borderTopLeftRadius: 8,
@@ -107,12 +108,12 @@ export function ChatArea({
         </IconButton>
       </Box>
 
-      {/* Contenido expandible */}
+      {/* Contenido */}
       <Collapse in={!collapsed} timeout="auto" unmountOnExit>
         <Box display="flex" flexDirection="row" gap={3} px={3} py={3} flex={1} minHeight={320}>
-          {/* Chat Messages + Input (60%) */}
+          {/* Chat (60%) */}
           <Box flex={3} minWidth={0} height="100%" display="flex" flexDirection="column">
-            {/* Mensajes con scroll */}
+            {/* Mensajes */}
             <Box flex={1} minHeight={0} maxHeight="45vh" overflow="auto" mb={1}>
               <Stack spacing={2}>
                 {messages.map((message) => (
@@ -145,7 +146,7 @@ export function ChatArea({
                 ))}
               </Stack>
             </Box>
-            {/* Input siempre visible */}
+            {/* Input */}
             <Box display="flex" alignItems="end" gap={2} pt={2} pb={1}>
               <TextField
                 multiline
@@ -180,72 +181,52 @@ export function ChatArea({
               </Stack>
             </Box>
           </Box>
-          {/* Uploaded Files (40%) */}
+
+          {/* Lateral: archivos config + requisitos ejemplo (40%) */}
           {showFiles && (
-            <Box flex={2} minWidth={0} borderLeft={1} borderColor="divider" pl={3} height="100%">
+            <Box flex={2} minWidth={0} borderLeft={1} borderColor="divider" pl={3} height="100%" display="flex" flexDirection="column">
+              {/* Combo de archivos subidos (mock) */}
               <Box mb={2}>
-                <Typography fontWeight="medium" display="flex" alignItems="center" gap={1}>
+                <Typography fontWeight="medium" display="flex" alignItems="center" gap={1} mb={1}>
                   <UploadIcon fontSize="small" />
                   {t.referenceFiles}
                 </Typography>
+                <TextField
+                  select
+                  value={selectedConfigFile}
+                  onChange={e => setSelectedConfigFile(e.target.value as number | "")}
+                  SelectProps={{ native: true }}
+                  size="small"
+                  fullWidth
+                  sx={{ mb: 2 }}
+                >
+                  <option value="">{t.selectFilePlaceholder}</option>
+                  {uploadedConfigFilesMock.map(f =>
+                    <option key={f.id} value={f.id}>{f.name}</option>
+                  )}
+                </TextField>
               </Box>
-              <Stack direction="column" spacing={1}>
-                {uploadedFiles.length > 0 ? (
-                  uploadedFiles.map((file, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        p: 1,
-                        borderRadius: 1,
-                        bgcolor: "grey.50",
-                        boxShadow: 0.5,
-                        mb: 0.5,
-                        pr: 1
-                      }}
-                    >
-                      <FileTextIcon fontSize="small" sx={{ mr: 1 }} />
-                      <Typography variant="body2" noWrap sx={{ flex: 1, maxWidth: 120 }}>
-                        {file.name}
-                      </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={() => removeFile(index)}
-                        sx={{ ml: 1 }}
-                        color="error"
-                        title={t.removeFile || "Eliminar"}
-                      >
-                        <CloseIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  ))
-                ) : (
-                  <Typography variant="body2" color="text.secondary" fontStyle="italic">
-                    {t.noFilesUploaded}
-                  </Typography>
-                )}
-                {/* Botón subir archivo al final */}
-                <Box>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    multiple
-                    accept=".txt,.doc,.docx,.pdf,.md"
-                    onChange={handleFileUpload}
-                    style={{ display: "none" }}
-                  />
-                  <Button
-                    variant="outlined"
-                    startIcon={<UploadIcon />}
-                    onClick={() => fileInputRef.current?.click()}
-                    fullWidth
-                    sx={{ mt: 1 }}
-                  >
-                    {t.addFileButton || "Subir archivo"}
-                  </Button>
-                </Box>
-              </Stack>
+
+              {/* Campo de texto multilinea para ejemplos de requisitos */}
+              <Box flex={1} display="flex" flexDirection="column">
+                <Typography variant="subtitle2" fontWeight="medium" mb={1}>
+                    {t.exampleRequirementsTitle}
+                </Typography>           
+                <TextField
+                  multiline
+                  minRows={7}
+                  maxRows={14}
+                  fullWidth
+                  variant="outlined"
+                  placeholder={t.exampleRequirementsPlaceholder}
+                  value={exampleRequirementsText}
+                  onChange={e => setExampleRequirementsText(e.target.value)}
+                  sx={{ flex: 1, mb: 1 }}
+                />
+                <Typography variant="caption" color="text.secondary">
+                    {t.exampleRequirementsNote}
+                </Typography>
+              </Box>
             </Box>
           )}
         </Box>

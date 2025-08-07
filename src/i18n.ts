@@ -18,6 +18,10 @@ const translations: Record<Language, Translations> = {
     noFilesUploaded: "No files uploaded yet.",
     expand: "Expand",
     collapse: "Collapse",
+    selectFilePlaceholder: "Select a file",
+    exampleRequirementsTitle: "Requirement Examples",
+    exampleRequirementsPlaceholder: "Paste your requirement examples here...",
+    exampleRequirementsNote: "The content will be sent automatically to the AI when generating requirements. You don't need to save.",
 
     // RequirementsTable
     requirementsTableTitle: "Requirements Table",
@@ -146,6 +150,10 @@ const translations: Record<Language, Translations> = {
     noFilesUploaded: "Aún no se han subido archivos.",
     expand: "Expandir",
     collapse: "Contraer",
+    selectFilePlaceholder: "Selecciona un archivo",
+    exampleRequirementsTitle: "Ejemplos de requisitos",
+    exampleRequirementsPlaceholder: "Pega aquí tus ejemplos de requisitos...",
+    exampleRequirementsNote: "El contenido se enviará automáticamente a la IA al generar requisitos. No necesitas guardar.",
 
     // RequirementsTable
     requirementsTableTitle: "Tabla de Requisitos",
@@ -274,6 +282,10 @@ const translations: Record<Language, Translations> = {
     noFilesUploaded: "Encara no s'han pujat fitxers.",
     expand: "Expandir",
     collapse: "Contraure",
+    selectFilePlaceholder: "Selecciona un fitxer",
+    exampleRequirementsTitle: "Exemples de requisits",
+    exampleRequirementsPlaceholder: "Enganxa aquí els teus exemples de requisits...",
+    exampleRequirementsNote: "El contingut s'enviarà automàticament a la IA en generar requisits. No cal que desis.",
 
     // RequirementsTable
     requirementsTableTitle: "Taula de Requisits",
