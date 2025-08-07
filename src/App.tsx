@@ -22,7 +22,7 @@ interface AppProps {
 export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState("es");
-  const [activeProject, setActiveProject] = useState("E-Commerce Platform");
+  const [activeProject, setActiveProject] = useState(projectsMock[0]); // Asume que el primer proyecto es el activo
   const navigate = useNavigate();
 
   // Estados de colapso
@@ -50,7 +50,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default", color: "text.primary" }}>
       {/* Header */}
       <Header
-        activeProject={activeProject}
+        activeProject={activeProject.name}
         isDarkMode={isDarkMode}
         onToggleDarkMode={onToggleDarkMode}
         onToggleMenu={() => setIsMenuOpen(true)}
@@ -65,7 +65,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
         projects={projects}
         activeProject={activeProject}
         onProjectChange={(project) => {
-          setActiveProject(project.name);
+          setActiveProject(project);
           setIsMenuOpen(false);
         }}
         onSettings={() => {
@@ -106,6 +106,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                     collapsed={isChatCollapsed}
                     onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
                     language={language as "en" | "es" | "ca"}
+                    projectId={activeProject.id}
                   />
                 </Box>
                 {/* RequirementsTable ocupa el resto, con scroll propio */}
@@ -116,6 +117,8 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                       collapsed={isReqsCollapsed}
                       onToggleCollapse={() => setIsReqsCollapsed((c) => !c)}
                       language={language as "en" | "es" | "ca"}
+                      ownerId={user.id}
+                      projectId={activeProject.id}
                     />
                   </Box>
                 )}

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
 // Define los estados posibles
-type StateMachineState = "init" | "software_questions" | "new_requisites" | "analyze_requisites" | "stall";
+export type StateMachineState = "init" | "software_questions" | "new_requisites" | "analyze_requisites" | "stall";
 // Puedes ampliar la interface según la lógica real
 interface StateMachineContextType {
   state: StateMachineState;

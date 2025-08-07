@@ -17,7 +17,7 @@ interface SideMenuProps {
   isOpen: boolean;
   onClose: () => void;
   projects: ProjectModel[];
-  activeProject: string;
+  activeProject: ProjectModel;
   onProjectChange: (project: ProjectModel) => void;
   user?: UserModel
   onLogout: () => void;
@@ -133,7 +133,7 @@ export function SideMenu({
               {projects.map((project) => (
                 <ListItem disablePadding key={project.id}>
                   <ListItemButton
-                    selected={project.name === activeProject}
+                    selected={project.name === activeProject.name}
                     onClick={() => {
                       onProjectChange(project);
                       onClose();
@@ -141,13 +141,13 @@ export function SideMenu({
                     sx={{ borderRadius: 1 }}
                   >
                     <ListItemAvatar sx={{ minWidth: 32 }}>
-                      <FolderOpenIcon color={project.name === activeProject ? "primary" : "disabled"} fontSize="small" />
+                      <FolderOpenIcon color={project.name === activeProject.name ? "primary" : "disabled"} fontSize="small" />
                     </ListItemAvatar>
                     <ListItemText
                       primary={project.name}
                       primaryTypographyProps={{
-                        fontWeight: project.name === activeProject ? "bold" : "medium",
-                        color: project.name === activeProject ? "primary.main" : undefined,
+                        fontWeight: project.name === activeProject.name ? "bold" : "medium",
+                        color: project.name === activeProject.name ? "primary.main" : undefined,
                         fontSize: 15
                       }}
                     />

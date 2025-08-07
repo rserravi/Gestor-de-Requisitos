@@ -18,68 +18,37 @@ import {
   List as TableIcon
 } from "@mui/icons-material";
 import { getTranslations, type Language } from "../i18n";
-
-interface Requirement {
-  id: string;
-  description: string;
-  status: 'draft' | 'approved' | 'rejected' | 'in-review';
-  category: 'functional' | 'performance' | 'usability' | 'security' | 'technical';
-  priority: 'must' | 'should' | 'could' | 'wont';
-  visualReference?: string;
-  number: number;
-}
+import type { RequirementModel } from "../models/requeriment-model";
+import { requirementsMock } from "../mock/requirements-mock";
 
 interface RequirementsTableProps {
   collapsed: boolean;
   onToggleCollapse: () => void;
   language: Language;
+  projectId: number; 
+  ownerId: number;
 }
 
-const statusColors: Record<Requirement['status'], 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
+const statusColors: Record<RequirementModel['status'], 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
   draft: "warning",
   approved: "success",
   rejected: "error",
   "in-review": "info"
 };
 
-const priorityColors: Record<Requirement['priority'], 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
+const priorityColors: Record<RequirementModel['priority'], 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
   must: "error",
   should: "warning",
   could: "info",
   wont: "default"
 };
 
-export function RequirementsTable({ collapsed, onToggleCollapse, language }: RequirementsTableProps) {
+export function RequirementsTable({ collapsed, onToggleCollapse, language, projectId, ownerId }: RequirementsTableProps) {
   const t = getTranslations(language);
-  const [requirements, setRequirements] = useState<Requirement[]>([
-    {
-      id: '1',
-      number: 1,
-      description: 'User must be able to login with email and password',
-      status: 'draft',
-      category: 'functional',
-      priority: 'must'
-    },
-    {
-      id: '2',
-      number: 2,
-      description: 'System should respond within 2 seconds for all operations',
-      status: 'in-review',
-      category: 'performance',
-      priority: 'should'
-    },
-    {
-      id: '3',
-      number: 3,
-      description: 'Interface must be accessible on mobile devices',
-      status: 'approved',
-      category: 'usability',
-      priority: 'must'
-    }
-  ]);
+  const [requirements, setRequirements] = useState<RequirementModel[]>(requirementsMock as RequirementModel[]);
 
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<Partial<Requirement>>({});
+  const [editForm, setEditForm] = useState<Partial<RequirementModel>>({});
 
   // Filtros
   const [textFilter, setTextFilter] = useState("");
@@ -103,7 +72,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language }: Req
   }, [requirements, textFilter, statusFilter, categoryFilter, priorityFilter]);
 
   // Acciones de edición
-  const startEdit = (requirement: Requirement) => {
+  const startEdit = (requirement: RequirementModel) => {
     setEditingId(requirement.id);
     setEditForm(requirement);
   };
@@ -130,13 +99,18 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language }: Req
 
   const addRequirement = () => {
     const maxNumber = Math.max(...requirements.map(req => req.number), 0);
-    const newRequirement: Requirement = {
+    const newRequirement: RequirementModel = {
       id: Date.now().toString(),
       number: maxNumber + 1,
       description: t.newRequirementDescription,
       status: 'draft',
       category: 'functional',
-      priority: 'should'
+      priority: 'should',
+      visualReference: '',
+      projectId: projectId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      ownerId: ownerId
     };
     setRequirements(prev => [...prev, newRequirement]);
     startEdit(newRequirement);
@@ -309,7 +283,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language }: Req
                       {editingId === requirement.id ? (
                         <Select
                           value={editForm.status || requirement.status}
-                          onChange={(e) => setEditForm({ ...editForm, status: e.target.value as Requirement['status'] })}
+                          onChange={(e) => setEditForm({ ...editForm, status: e.target.value as RequirementModel['status'] })}
                           size="small"
                           fullWidth
                         >
@@ -330,7 +304,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language }: Req
                       {editingId === requirement.id ? (
                         <Select
                           value={editForm.category || requirement.category}
-                          onChange={(e) => setEditForm({ ...editForm, category: e.target.value as Requirement['category'] })}
+                          onChange={(e) => setEditForm({ ...editForm, category: e.target.value as RequirementModel['category'] })}
                           size="small"
                           fullWidth
                         >
@@ -350,7 +324,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language }: Req
                       {editingId === requirement.id ? (
                         <Select
                           value={editForm.priority || requirement.priority}
-                          onChange={(e) => setEditForm({ ...editForm, priority: e.target.value as Requirement['priority'] })}
+                          onChange={(e) => setEditForm({ ...editForm, priority: e.target.value as RequirementModel['priority'] })}
                           size="small"
                           fullWidth
                         >

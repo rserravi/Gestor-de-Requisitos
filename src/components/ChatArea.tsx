@@ -12,13 +12,8 @@ import {
   ExpandMore
 } from "@mui/icons-material";
 import { getTranslations, type Language } from "../i18n";
-
-interface Message {
-  id: string;
-  content: string;
-  sender: 'user' | 'ai';
-  timestamp: Date;
-}
+import type { MessageModel } from "../models/message-model";
+import { messageMock } from "../mock/message-mock";
 
 interface ChatAreaProps {
   onGenerateRequirements: () => void;
@@ -26,6 +21,7 @@ interface ChatAreaProps {
   collapsed: boolean;
   onToggleCollapse: () => void;
   language: Language;
+  projectId: number; // Opcional, si necesitas el ID del proyecto
 }
 
 export function ChatArea({
@@ -34,16 +30,10 @@ export function ChatArea({
   collapsed,
   onToggleCollapse,
   language,
+  projectId
 }: ChatAreaProps) {
   const t = getTranslations(language);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      content: t.aiInitialMessage,
-      sender: 'ai',
-      timestamp: new Date()
-    }
-  ]);
+  const [messages, setMessages] = useState<MessageModel[]>(messageMock as MessageModel[]); // Mock inicial
   const [inputValue, setInputValue] = useState("");
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -51,11 +41,13 @@ export function ChatArea({
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
 
-    const newMessage: Message = {
+    const newMessage: MessageModel = {
       id: Date.now().toString(),
       content: inputValue,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
+      state: "init", // Puedes ajustar el estado según tu lógica
+      project_id: projectId
     };
 
     setMessages(prev => [...prev, newMessage]);
@@ -63,11 +55,13 @@ export function ChatArea({
 
     // Simulate AI response
     setTimeout(() => {
-      const aiResponse: Message = {
+      const aiResponse: MessageModel = {
         id: (Date.now() + 1).toString(),
         content: t.aiResponseMessage,
         sender: 'ai',
-        timestamp: new Date()
+        timestamp: new Date(),
+        state: "init", // Puedes ajustar el estado según tu lógica
+        project_id: projectId
       };
       setMessages(prev => [...prev, aiResponse]);
     }, 1000);
