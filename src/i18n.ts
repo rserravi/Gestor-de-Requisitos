@@ -115,6 +115,23 @@ const translations: Record<Language, Translations> = {
     settingsFilesMarkFavorite: "Mark as favorite",
     settingsFilesDelete: "Delete",
     settingsFilesUploadNew: "Upload new file",
+
+    // LoginPage
+    loginTitle: "Login",
+    registerTitle: "Register",
+    usernameLabelRegister: "Username",
+    usernameLabelLogin: "Username",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    errorUsernameRequired: "Username is required",
+    errorEmailPasswordRequired: "Email and password are required",
+    errorUserPasswordRequired: "Username and password are required",
+    loginButton: "Login",
+    registerButton: "Create Account",
+    noAccountPrompt: "Don't have an account?",
+    registerLink: "Register",
+    hasAccountPrompt: "Already have an account?",
+    loginLink: "Login",
   },
   es: {
     // ChatArea
@@ -226,6 +243,23 @@ const translations: Record<Language, Translations> = {
     settingsFilesMarkFavorite: "Marcar como favorito",
     settingsFilesDelete: "Eliminar",
     settingsFilesUploadNew: "Subir nuevo archivo",
+
+    // LoginPage
+    loginTitle: "Iniciar sesión",
+    registerTitle: "Registrarse",
+    usernameLabelRegister: "Nombre de usuario",
+    usernameLabelLogin: "Usuario",
+    emailLabel: "Email",
+    passwordLabel: "Contraseña",
+    errorUsernameRequired: "El nombre de usuario es obligatorio",
+    errorEmailPasswordRequired: "Email y contraseña obligatorios",
+    errorUserPasswordRequired: "Usuario y contraseña obligatorios",
+    loginButton: "Entrar",
+    registerButton: "Crear cuenta",
+    noAccountPrompt: "¿No tienes cuenta?",
+    registerLink: "Regístrate",
+    hasAccountPrompt: "¿Ya tienes cuenta?",
+    loginLink: "Inicia sesión",
   },
   ca: {
     // ChatArea
@@ -337,6 +371,23 @@ const translations: Record<Language, Translations> = {
     settingsFilesMarkFavorite: "Marcar com a favorit",
     settingsFilesDelete: "Eliminar",
     settingsFilesUploadNew: "Pujar nou fitxer",
+
+    // LoginPage
+    loginTitle: "Iniciar sessió",
+    registerTitle: "Registrar-se",
+    usernameLabelRegister: "Nom d'usuari",
+    usernameLabelLogin: "Usuari",
+    emailLabel: "Email",
+    passwordLabel: "Contrasenya",
+    errorUsernameRequired: "El nom d'usuari és obligatori",
+    errorEmailPasswordRequired: "Email i contrasenya obligatoris",
+    errorUserPasswordRequired: "Usuari i contrasenya obligatoris",
+    loginButton: "Entrar",
+    registerButton: "Crear compte",
+    noAccountPrompt: "No tens compte?",
+    registerLink: "Registra't",
+    hasAccountPrompt: "Ja tens compte?",
+    loginLink: "Inicia sessió",
   },
 };
 

@@ -11,7 +11,7 @@ import type { UserModel } from "./models/user-model.ts";
 // mocks
 import { projectsMock } from "./mock/projects-mock.ts";
 import { usermock } from "./mock/user-mock.ts";
-import { SettingsPage } from "./pages/SettingsScreen.tsx";
+import { SettingsPage } from "./pages/SettingsPage.tsx";
 import { useStateMachine } from "./context/StateMachineContext";
 
 interface AppProps {

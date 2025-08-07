@@ -1,10 +1,9 @@
-import { StrictMode, useState, useEffect } from 'react'
-import { createRoot } from 'react-dom/client'
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material'
-import { BrowserRouter } from "react-router-dom"
-import App from './App.tsx'
-import '../styles/globals.css'
-import { StateMachineProvider } from "./context/StateMachineContext"
+import { StrictMode, useState, useEffect } from "react";
+import { createRoot } from "react-dom/client";
+import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
+import { BrowserRouter } from "react-router-dom";
+import { StateMachineProvider } from "./context/StateMachineContext";
+import { RootRouter } from "./router/RootRouter";
 
 // --- Hook para dark mode persistente ---
 function useDarkMode() {
@@ -27,7 +26,7 @@ function MainWrapper() {
 
   const theme = createTheme({
     palette: {
-      mode: isDarkMode ? 'dark' : 'light',
+      mode: isDarkMode ? "dark" : "light",
       // Personaliza aquí tus colores si quieres
     },
     // Puedes personalizar tipografía, etc.
@@ -37,9 +36,10 @@ function MainWrapper() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <StateMachineProvider>
-        <App
+        {/* Aquí metemos el enrutador global */}
+        <RootRouter
           isDarkMode={isDarkMode}
-          onToggleDarkMode={() => setIsDarkMode(d => !d)}
+          onToggleDarkMode={() => setIsDarkMode((d) => !d)}
         />
       </StateMachineProvider>
     </ThemeProvider>
@@ -47,7 +47,7 @@ function MainWrapper() {
 }
 
 // -- Render --
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <MainWrapper />
