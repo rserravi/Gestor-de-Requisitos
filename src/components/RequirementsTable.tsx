@@ -15,7 +15,9 @@ import {
   FilterAlt as FilterIcon,
   ExpandLess,
   ExpandMore,
-  List as TableIcon
+  List as TableIcon,
+  ArrowUpward,
+  ArrowDownward
 } from "@mui/icons-material";
 import { getTranslations, type Language } from "../i18n";
 import type { RequirementModel } from "../models/requeriment-model";
@@ -63,6 +65,19 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
 
+  // Ordenación
+  const [sortBy, setSortBy] = useState<keyof RequirementModel>('number');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  const handleSort = (key: keyof RequirementModel) => {
+    if (sortBy === key) {
+      setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortBy(key);
+      setSortDirection('asc');
+    }
+  };
+
   // Cargar requisitos del backend cuando cambia el proyecto
   useEffect(() => {
     setLoading(true);
@@ -72,9 +87,9 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
       .finally(() => setLoading(false));
   }, [projectId]);
 
-  // Filtrado de requisitos
+  // Filtrado + ordenación de requisitos
   const filteredRequirements = useMemo(() => {
-    return requirements.filter((req) => {
+    let filtered = requirements.filter((req) => {
       const matchesText = textFilter === "" ||
         req.description.toLowerCase().includes(textFilter.toLowerCase()) ||
         `REQ-${req.number.toString().padStart(3, '0')}`.toLowerCase().includes(textFilter.toLowerCase());
@@ -85,7 +100,23 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
 
       return matchesText && matchesStatus && matchesCategory && matchesPriority;
     });
-  }, [requirements, textFilter, statusFilter, categoryFilter, priorityFilter]);
+
+    // Ordenar
+    filtered = [...filtered].sort((a, b) => {
+      let aVal = a[sortBy];
+      let bVal = b[sortBy];
+      if (sortBy === 'number') {
+        return sortDirection === 'asc'
+          ? (aVal as number) - (bVal as number)
+          : (bVal as number) - (aVal as number);
+      }
+      return sortDirection === 'asc'
+        ? String(aVal).localeCompare(String(bVal))
+        : String(bVal).localeCompare(String(aVal));
+    });
+
+    return filtered;
+  }, [requirements, textFilter, statusFilter, categoryFilter, priorityFilter, sortBy, sortDirection]);
 
   // Acciones de edición
   const startEdit = (requirement: RequirementModel) => {
@@ -288,11 +319,41 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
           <Table stickyHeader size="small" sx={{ minWidth: 800 }}>
             <TableHead>
               <TableRow>
-                <TableCell>{t.headerId}</TableCell>
-                <TableCell>{t.headerDescription}</TableCell>
-                <TableCell>{t.headerStatus}</TableCell>
-                <TableCell>{t.headerCategory}</TableCell>
-                <TableCell>{t.headerPriority}</TableCell>
+                <TableCell
+                  onClick={() => handleSort('number')}
+                  sx={{ cursor: "pointer", userSelect: "none" }}
+                >
+                  {t.headerId}
+                  {sortBy === 'number' ? (sortDirection === 'asc' ? <ArrowUpward fontSize="inherit" /> : <ArrowDownward fontSize="inherit" />) : null}
+                </TableCell>
+                <TableCell
+                  onClick={() => handleSort('description')}
+                  sx={{ cursor: "pointer", userSelect: "none" }}
+                >
+                  {t.headerDescription}
+                  {sortBy === 'description' ? (sortDirection === 'asc' ? <ArrowUpward fontSize="inherit" /> : <ArrowDownward fontSize="inherit" />) : null}
+                </TableCell>
+                <TableCell
+                  onClick={() => handleSort('status')}
+                  sx={{ cursor: "pointer", userSelect: "none" }}
+                >
+                  {t.headerStatus}
+                  {sortBy === 'status' ? (sortDirection === 'asc' ? <ArrowUpward fontSize="inherit" /> : <ArrowDownward fontSize="inherit" />) : null}
+                </TableCell>
+                <TableCell
+                  onClick={() => handleSort('category')}
+                  sx={{ cursor: "pointer", userSelect: "none" }}
+                >
+                  {t.headerCategory}
+                  {sortBy === 'category' ? (sortDirection === 'asc' ? <ArrowUpward fontSize="inherit" /> : <ArrowDownward fontSize="inherit" />) : null}
+                </TableCell>
+                <TableCell
+                  onClick={() => handleSort('priority')}
+                  sx={{ cursor: "pointer", userSelect: "none" }}
+                >
+                  {t.headerPriority}
+                  {sortBy === 'priority' ? (sortDirection === 'asc' ? <ArrowUpward fontSize="inherit" /> : <ArrowDownward fontSize="inherit" />) : null}
+                </TableCell>
                 <TableCell>{t.headerVisual}</TableCell>
                 <TableCell>{t.headerActions}</TableCell>
               </TableRow>
