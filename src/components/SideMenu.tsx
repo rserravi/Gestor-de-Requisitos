@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Drawer, Box, Typography, IconButton, Button, Avatar, List, ListItem, ListItemAvatar, ListItemText, ListItemButton, Divider, Stack,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField
@@ -7,14 +7,11 @@ import {
   Settings as SettingsIcon,
   Logout as LogoutIcon,
   FolderOpen as FolderOpenIcon,
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon
+  Add as AddIcon
 } from "@mui/icons-material";
 import { getTranslations, type Language } from "../i18n";
 import type { ProjectModel } from "../models/project-model";
 import type { UserModel } from "../models/user-model";
-import { updateProject, deleteProject } from "../services/project-service";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -22,11 +19,13 @@ interface SideMenuProps {
   projects: ProjectModel[];
   activeProject: ProjectModel | null;
   onProjectChange: (project: ProjectModel) => void;
-  user?: UserModel | null;
+  user?: UserModel;
   onLogout: () => void;
   language: Language;
   onSettings: () => void;
   onProjectCreated?: (name: string, desc: string) => Promise<void>;
+  openNewProjectModal: boolean;
+  setOpenNewProjectModal: (open: boolean) => void;
 }
 
 export function SideMenu({
@@ -40,6 +39,8 @@ export function SideMenu({
   language,
   onSettings,
   onProjectCreated,
+  openNewProjectModal,
+  setOpenNewProjectModal,
 }: SideMenuProps) {
   const t = getTranslations(language);
 
@@ -50,15 +51,12 @@ export function SideMenu({
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // Modal de editar proyecto
-  const [editProjectOpen, setEditProjectOpen] = useState(false);
-  const [editProjId, setEditProjId] = useState<number | null>(null);
+  // Abre modal si lo indica la prop global
+  useEffect(() => {
+    if (openNewProjectModal) setNewProjectOpen(true);
+  }, [openNewProjectModal]);
 
-  // Modal de borrar proyecto
-  const [deleteProjectOpen, setDeleteProjectOpen] = useState(false);
-  const [deleteProjId, setDeleteProjId] = useState<number | null>(null);
-
-  // Handler de guardar proyecto (real)
+  // Handler de guardar proyecto
   const handleAddProject = async () => {
     setError("");
     if (!projName.trim()) {
@@ -73,59 +71,19 @@ export function SideMenu({
       setProjName("");
       setProjDesc("");
       setNewProjectOpen(false);
-      setSaving(false);
-      onClose();
+      setOpenNewProjectModal(false);
+      onClose(); // Cierra SideMenu
     } catch (err: any) {
       setError("Error al crear el proyecto");
+    } finally {
       setSaving(false);
     }
   };
 
-  // Handler de editar proyecto
-  const handleEditProject = async () => {
-    setError("");
-    if (!projName.trim() || editProjId == null) {
-      setError("El nombre es obligatorio");
-      return;
-    }
-    setSaving(true);
-    try {
-      await updateProject(editProjId, { name: projName.trim(), description: projDesc.trim() });
-      setProjName("");
-      setProjDesc("");
-      setEditProjectOpen(false);
-      setSaving(false);
-      onClose();
-      // Recarga total desde App.tsx por props (o podrías hacer un callback)
-      window.location.reload(); // O mejor, refrescar lista con un callback
-    } catch (err: any) {
-      setError("Error al editar el proyecto");
-      setSaving(false);
-    }
-  };
-
-  // Handler de borrar proyecto
-  const handleDeleteProject = async () => {
-    if (deleteProjId == null) return;
-    setSaving(true);
-    try {
-      await deleteProject(deleteProjId);
-      setDeleteProjectOpen(false);
-      setSaving(false);
-      onClose();
-      window.location.reload(); // O mejor, refrescar lista y cambiar proyecto activo si corresponde
-    } catch (err: any) {
-      setError("Error al borrar el proyecto");
-      setSaving(false);
-    }
-  };
-
-  // Abrir modal de editar, rellenar nombre y desc
-  const openEditModal = (project: ProjectModel) => {
-    setEditProjId(project.id);
-    setProjName(project.name);
-    setProjDesc(project.description);
-    setEditProjectOpen(true);
+  // Cuando el usuario cancela
+  const handleCancelNewProject = () => {
+    setNewProjectOpen(false);
+    setOpenNewProjectModal(false);
   };
 
   return (
@@ -160,7 +118,7 @@ export function SideMenu({
         {/* User Section */}
         {user && (
           <Box display="flex" alignItems="center" gap={2} px={3} py={3}>
-            <Avatar src={user.avatar || undefined} alt={user.username} sx={{ width: 40, height: 40 }} />
+            <Avatar src={user.avatar} alt={user.username} sx={{ width: 40, height: 40 }} />
             <Box flex={1}>
               <Typography fontWeight="medium">{user.username}</Typography>
               <Typography variant="body2" color="text.secondary">
@@ -187,34 +145,7 @@ export function SideMenu({
           <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto", px: 1 }}>
             <List dense>
               {projects.map((project) => (
-                <ListItem disablePadding key={project.id}
-                  secondaryAction={
-                    <>
-                      <IconButton
-                        edge="end"
-                        aria-label="editar"
-                        size="small"
-                        onClick={() => openEditModal(project)}
-                        title="Editar proyecto"
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        edge="end"
-                        aria-label="borrar"
-                        size="small"
-                        color="error"
-                        onClick={() => {
-                          setDeleteProjId(project.id);
-                          setDeleteProjectOpen(true);
-                        }}
-                        title="Borrar proyecto"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </>
-                  }
-                >
+                <ListItem disablePadding key={project.id}>
                   <ListItemButton
                     selected={project.id === activeProject?.id}
                     onClick={() => {
@@ -271,7 +202,12 @@ export function SideMenu({
       </Drawer>
 
       {/* Modal de añadir nuevo proyecto */}
-      <Dialog open={newProjectOpen} onClose={() => setNewProjectOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={newProjectOpen}
+        onClose={handleCancelNewProject}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>Añadir nuevo proyecto</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
@@ -299,7 +235,7 @@ export function SideMenu({
           </Stack>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setNewProjectOpen(false)} disabled={saving}>
+          <Button onClick={handleCancelNewProject} disabled={saving}>
             Cancelar
           </Button>
           <Button
@@ -308,69 +244,6 @@ export function SideMenu({
             disabled={saving}
           >
             {saving ? "Guardando..." : "Crear proyecto"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Modal de editar proyecto */}
-      <Dialog open={editProjectOpen} onClose={() => setEditProjectOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Editar proyecto</DialogTitle>
-        <DialogContent>
-          <Stack spacing={2} mt={1}>
-            <TextField
-              label="Nombre del proyecto"
-              value={projName}
-              onChange={e => setProjName(e.target.value)}
-              required
-              fullWidth
-              autoFocus
-            />
-            <TextField
-              label="Descripción"
-              value={projDesc}
-              onChange={e => setProjDesc(e.target.value)}
-              multiline
-              minRows={2}
-              fullWidth
-            />
-            {error && (
-              <Typography color="error" variant="body2">
-                {error}
-              </Typography>
-            )}
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setEditProjectOpen(false)} disabled={saving}>
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleEditProject}
-            variant="contained"
-            disabled={saving}
-          >
-            {saving ? "Guardando..." : "Guardar cambios"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Modal de confirmación de borrado */}
-      <Dialog open={deleteProjectOpen} onClose={() => setDeleteProjectOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Confirmar borrado</DialogTitle>
-        <DialogContent>
-          <Typography>¿Estás seguro de que deseas borrar este proyecto? Esta acción no se puede deshacer.</Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setDeleteProjectOpen(false)} disabled={saving}>
-            Cancelar
-          </Button>
-          <Button
-            onClick={handleDeleteProject}
-            variant="contained"
-            color="error"
-            disabled={saving}
-          >
-            {saving ? "Borrando..." : "Borrar"}
           </Button>
         </DialogActions>
       </Dialog>
