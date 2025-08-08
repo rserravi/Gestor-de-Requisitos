@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Box, Paper, Stack, Typography, IconButton, Button, Divider,
   Table, TableHead, TableRow, TableCell, TableBody, TableContainer,
-  Select, MenuItem, TextField, Chip, Collapse
+  Select, MenuItem, TextField, Chip, Collapse, CircularProgress, Alert
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -19,13 +19,18 @@ import {
 } from "@mui/icons-material";
 import { getTranslations, type Language } from "../i18n";
 import type { RequirementModel } from "../models/requeriment-model";
-import { requirementsMock } from "../mock/requirements-mock";
+import {
+  fetchProjectRequirements,
+  createRequirement,
+  updateRequirement,
+  deleteRequirement as deleteRequirementApi
+} from "../services/requirements-service";
 
 interface RequirementsTableProps {
   collapsed: boolean;
   onToggleCollapse: () => void;
   language: Language;
-  projectId: number; 
+  projectId: number;
   ownerId: number;
 }
 
@@ -45,7 +50,9 @@ const priorityColors: Record<RequirementModel['priority'], 'default' | 'primary'
 
 export function RequirementsTable({ collapsed, onToggleCollapse, language, projectId, ownerId }: RequirementsTableProps) {
   const t = getTranslations(language);
-  const [requirements, setRequirements] = useState<RequirementModel[]>(requirementsMock as RequirementModel[]);
+  const [requirements, setRequirements] = useState<RequirementModel[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<RequirementModel>>({});
@@ -55,6 +62,15 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+
+  // Cargar requisitos del backend cuando cambia el proyecto
+  useEffect(() => {
+    setLoading(true);
+    fetchProjectRequirements(projectId)
+      .then(setRequirements)
+      .catch(() => setError("No se pudieron cargar los requisitos"))
+      .finally(() => setLoading(false));
+  }, [projectId]);
 
   // Filtrado de requisitos
   const filteredRequirements = useMemo(() => {
@@ -82,38 +98,58 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
     setEditForm({});
   };
 
-  const saveEdit = () => {
+  // Guardar edición
+  const saveEdit = async () => {
     if (!editingId) return;
-    setRequirements(prev =>
-      prev.map(req =>
-        req.id === editingId ? { ...req, ...editForm } : req
-      )
-    );
-    setEditingId(null);
-    setEditForm({});
+    setLoading(true);
+    try {
+      const updated = await updateRequirement(editingId, editForm);
+      setRequirements(prev =>
+        prev.map(req =>
+          req.id === editingId ? updated : req
+        )
+      );
+      setEditingId(null);
+      setEditForm({});
+    } catch (err: any) {
+      setError("No se pudo actualizar el requisito");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteRequirement = (id: string) => {
-    setRequirements(prev => prev.filter(req => req.id !== id));
+  // Eliminar requisito
+  const handleDelete = async (id: string) => {
+    setLoading(true);
+    try {
+      await deleteRequirementApi(id);
+      setRequirements(prev => prev.filter(req => req.id !== id));
+    } catch (err: any) {
+      setError("No se pudo eliminar el requisito");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const addRequirement = () => {
-    const maxNumber = Math.max(...requirements.map(req => req.number), 0);
-    const newRequirement: RequirementModel = {
-      id: Date.now().toString(),
-      number: maxNumber + 1,
-      description: t.newRequirementDescription,
-      status: 'draft',
-      category: 'functional',
-      priority: 'should',
-      visualReference: '',
-      projectId: projectId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ownerId: ownerId
-    };
-    setRequirements(prev => [...prev, newRequirement]);
-    startEdit(newRequirement);
+  // Añadir requisito
+  const addRequirement = async () => {
+    setLoading(true);
+    try {
+      const newRequirement: Partial<RequirementModel> = {
+        description: t.newRequirementDescription,
+        status: 'draft',
+        category: 'functional',
+        priority: 'should',
+        ownerId,
+      };
+      const created = await createRequirement(projectId, newRequirement);
+      setRequirements(prev => [...prev, created]);
+      startEdit(created);
+    } catch (err: any) {
+      setError("No se pudo crear el requisito");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const clearFilters = () => {
@@ -147,6 +183,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
             variant="contained"
             size="small"
             onClick={addRequirement}
+            disabled={loading}
           >
             {t.addRequirement}
           </Button>
@@ -158,6 +195,16 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
 
       {/* Collapse de tabla */}
       <Collapse in={!collapsed} timeout="auto" unmountOnExit>
+        {loading && (
+          <Box display="flex" alignItems="center" justifyContent="center" py={4}>
+            <CircularProgress />
+          </Box>
+        )}
+        {error && (
+          <Box display="flex" alignItems="center" justifyContent="center" py={2}>
+            <Alert severity="error">{error}</Alert>
+          </Box>
+        )}
         {/* Área de filtros compacta */}
         <Box px={3} pt={2} pb={0}>
           <Stack
@@ -366,7 +413,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
                               color="error"
                               size="small"
                               title={t.deleteRequirement}
-                              onClick={() => deleteRequirement(requirement.id)}
+                              onClick={() => handleDelete(requirement.id)}
                             >
                               <DeleteIcon fontSize="small" />
                             </IconButton>
