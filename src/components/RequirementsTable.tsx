@@ -20,7 +20,7 @@ import {
   ArrowDownward
 } from "@mui/icons-material";
 import { getTranslations, type Language } from "../i18n";
-import type { RequirementModel } from "../models/requeriment-model";
+import type { RequirementModel } from "../models/requirements-model";
 import {
   fetchProjectRequirements,
   createRequirement,
@@ -382,6 +382,10 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
                           onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                           size="small"
                           fullWidth
+                          multiline
+                          minRows={3}
+                          maxRows={10}
+                          inputProps={{ style: { fontSize: 15 } }}
                         />
                       ) : (
                         <Typography>{requirement.description}</Typography>

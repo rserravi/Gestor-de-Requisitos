@@ -1,4 +1,4 @@
-import type { RequirementModel } from "../models/requeriment-model";
+import type { RequirementModel } from "../models/requirements-model";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
