@@ -4,6 +4,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { getTranslations, type Language } from "../i18n";
+import { login, register } from "../services/auth-service";
 
 // Detecta el idioma del navegador y lo mapea a los soportados
 function getBrowserLanguage(): Language {
@@ -24,28 +25,25 @@ export function LoginPage() {
   const [language] = useState<Language>(getBrowserLanguage());
   const t = getTranslations(language);
 
-  // Simula auth: cualquier usuario/pw válido acepta login
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (mode === "register") {
-      if (!username) {
-        setError(t.errorUsernameRequired);
-        return;
-      }
-      if (!email || !password) {
-        setError(t.errorEmailPasswordRequired);
-        return;
-      }
-    } else {
-      if (!username || !password) {
-        setError(t.errorUserPasswordRequired);
-        return;
-      }
-    }
-    // Simula login/registro
-    localStorage.setItem("access_token", "mocktoken");
     setError("");
-    navigate("/");
+    try {
+      if (mode === "register") {
+        if (!username) { setError(t.errorUsernameRequired); return; }
+        if (!email || !password) { setError(t.errorEmailPasswordRequired); return; }
+        await register({ username, email, password });
+        setMode("login");
+        setError(""); // Registro OK, cambia a login
+      } else {
+        if (!username || !password) { setError(t.errorUserPasswordRequired); return; }
+        await login({ username, password });
+        setError("");
+        navigate("/");
+      }
+    } catch (err: any) {
+      setError(err.message || "Error");
+    }
   };
 
   return (

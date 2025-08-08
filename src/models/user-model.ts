@@ -22,6 +22,7 @@ export type UserPreferences = {
 
 export type ExampleFiles = {
     files: string[];
-    prefered: string
-    lastUpdated: Date;  
+    filesId?: number[];
+    prefered: string;
+    lastUpdated: Date;
 }

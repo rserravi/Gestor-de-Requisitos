@@ -1,18 +1,17 @@
-import { useState } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Route, Routes, useNavigate, Navigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import { Header } from "./components/Header";
 import { SideMenu } from "./components/SideMenu";
 import { ChatArea } from "./components/ChatArea";
 import { RequirementsTable } from "./components/RequirementsTable";
 import type { ProjectModel } from "./models/project-model";
-import type { UserModel } from "./models/user-model.ts";
-
-// mocks
-import { projectsMock } from "./mock/projects-mock.ts";
-import { usermock } from "./mock/user-mock.ts";
-import { SettingsPage } from "./pages/SettingsPage.tsx";
+import type { UserModel } from "./models/user-model";
+import { SettingsPage } from "./pages/SettingsPage";
+import { LoginPage } from "./pages/LoginPage";
 import { useStateMachine } from "./context/StateMachineContext";
+import { getMe, logout } from "./services/auth-service";
+import { listProjects, createProject } from "./services/project-service";
 
 interface AppProps {
   isDarkMode: boolean;
@@ -22,18 +21,16 @@ interface AppProps {
 export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState("es");
-  const [activeProject, setActiveProject] = useState(projectsMock[0]); // Asume que el primer proyecto es el activo
-  const navigate = useNavigate();
+  const [user, setUser] = useState<UserModel | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
-  // Estados de colapso
+  const [projects, setProjects] = useState<ProjectModel[]>([]);
+  const [activeProject, setActiveProject] = useState<ProjectModel | null>(null);
+
   const [isChatCollapsed, setIsChatCollapsed] = useState(false);
   const [isReqsCollapsed, setIsReqsCollapsed] = useState(false);
 
-  // Mocks
-  const projects: ProjectModel[] = projectsMock;
-  const user: UserModel = usermock;
-
-  // === StateMachine global ===
+  const navigate = useNavigate();
   const { state: smState } = useStateMachine();
 
   // Lógica de visibilidad
@@ -46,11 +43,58 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   const showRequirements =
     smState !== "init" && smState !== "software_questions";
 
+  // Recupera usuario al cargar App
+  useEffect(() => {
+    const fetchUser = async () => {
+      setLoadingUser(true);
+      try {
+        const userData = await getMe();
+        setUser(userData);
+        setLoadingUser(false);
+      } catch {
+        setUser(null);
+        setLoadingUser(false);
+        navigate("/login");
+      }
+    };
+    if (localStorage.getItem("access_token")) fetchUser();
+    else {
+      setLoadingUser(false);
+      navigate("/login");
+    }
+    // eslint-disable-next-line
+  }, []);
+
+  // Recupera proyectos cuando hay usuario
+  useEffect(() => {
+    if (user) {
+      listProjects()
+        .then(projs => {
+          setProjects(projs);
+          setActiveProject(projs[0] || null);
+        })
+        .catch(() => {
+          setProjects([]);
+          setActiveProject(null);
+        });
+    }
+  }, [user]);
+
+  // Handler para crear nuevo proyecto desde SideMenu
+  const handleProjectCreated = async (name: string, description: string) => {
+    const newProj = await createProject({ name, description });
+    const projs = await listProjects();
+    setProjects(projs);
+    setActiveProject(newProj);
+  };
+
+  if (loadingUser) return <Box>Loading...</Box>;
+
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", bgcolor: "background.default", color: "text.primary" }}>
       {/* Header */}
       <Header
-        activeProject={activeProject.name}
+        activeProject={activeProject?.name || ""}
         isDarkMode={isDarkMode}
         onToggleDarkMode={onToggleDarkMode}
         onToggleMenu={() => setIsMenuOpen(true)}
@@ -64,17 +108,22 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
         onClose={() => setIsMenuOpen(false)}
         projects={projects}
         activeProject={activeProject}
-        onProjectChange={(project) => {
-          setActiveProject(project);
+        onProjectChange={(project) => setActiveProject(project)}
+        user={user}
+        onLogout={() => {
+          logout();
+          setUser(null);
+          setProjects([]);
+          setActiveProject(null);
           setIsMenuOpen(false);
+          navigate("/login");
         }}
+        language={language as "en" | "es" | "ca"}
         onSettings={() => {
           setIsMenuOpen(false);
           navigate("/settings");
         }}
-        user={user}
-        onLogout={() => setIsMenuOpen(false)}
-        language={language as "en" | "es" | "ca"}
+        onProjectCreated={handleProjectCreated}
       />
 
       {/* Main Content */}
@@ -94,49 +143,68 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
         }}
       >
         <Routes>
+          {/* Login siempre accesible */}
+          <Route
+            path="/login"
+            element={
+              user
+                ? <Navigate to="/" replace />
+                : <LoginPage />
+            }
+          />
+          {/* Ruta principal, protegida */}
           <Route
             path="/"
             element={
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minHeight: 0 }}>
-                {/* ChatArea: nunca más del 70% vertical */}
-                <Box sx={{ flexShrink: 0, minHeight: 0 }}>
-                  <ChatArea
-                    onGenerateRequirements={() => { }}
-                    showFiles={showFiles}
-                    collapsed={isChatCollapsed}
-                    onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
-                    language={language as "en" | "es" | "ca"}
-                    projectId={activeProject.id}
-                  />
-                </Box>
-                {/* RequirementsTable ocupa el resto, con scroll propio */}
-                {showRequirements && (
-                  <Box sx={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
-
-                    <RequirementsTable
-                      collapsed={isReqsCollapsed}
-                      onToggleCollapse={() => setIsReqsCollapsed((c) => !c)}
+              user ? (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minHeight: 0 }}>
+                  {/* ChatArea */}
+                  <Box sx={{ flexShrink: 0, minHeight: 0 }}>
+                    <ChatArea
+                      onGenerateRequirements={() => { }}
+                      showFiles={showFiles}
+                      collapsed={isChatCollapsed}
+                      onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
                       language={language as "en" | "es" | "ca"}
-                      ownerId={user.id}
-                      projectId={activeProject.id}
+                      projectId={activeProject?.id || 0}
                     />
                   </Box>
-                )}
-              </Box>
+                  {/* RequirementsTable */}
+                  {showRequirements && activeProject && (
+                    <Box sx={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
+                      <RequirementsTable
+                        collapsed={isReqsCollapsed}
+                        onToggleCollapse={() => setIsReqsCollapsed((c) => !c)}
+                        language={language as "en" | "es" | "ca"}
+                        ownerId={user.id}
+                        projectId={activeProject.id}
+                      />
+                    </Box>
+                  )}
+                </Box>
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
-          {/* Ruta configuración */}
+          {/* Ruta configuración, protegida */}
           <Route
             path="/settings"
             element={
-              <SettingsPage
-                user={user}
-                onUpdate={() => {}}
-                language={language as "en" | "es" | "ca"}
-                onLanguageChange={setLanguage}
-              />
+              user ? (
+                <SettingsPage
+                  user={user}
+                  onUpdate={() => { }}
+                  language={language as "en" | "es" | "ca"}
+                  onLanguageChange={setLanguage}
+                />
+              ) : (
+                <Navigate to="/login" replace />
+              )
             }
           />
+          {/* Fallback: redirige a login */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Box>
     </Box>

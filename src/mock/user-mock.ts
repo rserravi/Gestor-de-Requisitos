@@ -15,6 +15,6 @@ export const usermock: UserModel = {
       theme: "dark",
       notifications: true,
       language: "en",
-    timezone: "UTC",
+      timezone: "UTC",
     }
 }
