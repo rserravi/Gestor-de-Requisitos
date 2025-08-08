@@ -57,6 +57,8 @@
     "react-i18next": "^14.1.2",
     "react-resizable-panels": "^2.0.20",
     "react-router-dom": "^6.18.0",
+    "react-markdown": "^9.0.0",
+    "rehype-highlight": "^6.0.0",
     "recharts": "^2.12.7",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.4.0",

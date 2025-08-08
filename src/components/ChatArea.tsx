@@ -1,20 +1,24 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
-  Paper, Box, Stack, Typography, IconButton, Button, Collapse, TextField
+  Paper, Box, Stack, Typography, IconButton, Button, Collapse, TextField, CircularProgress, Alert
 } from "@mui/material";
 import {
   Send as SendIcon,
   UploadFile as UploadIcon,
   AutoAwesome as SparklesIcon,
-  Close as CloseIcon,
   ExpandLess,
   ExpandMore
 } from "@mui/icons-material";
+import ReactMarkdown from "react-markdown";
 import { getTranslations, type Language } from "../i18n";
 import type { MessageModel } from "../models/message-model";
-import { messageMock } from "../mock/message-mock";
+import { useStateMachine } from "../context/StateMachineContext";
 
 interface ChatAreaProps {
+  chatMessages: MessageModel[];
+  loading: boolean;
+  error: string | null;
+  onSendMessage: (msg: Omit<MessageModel, "id" | "timestamp">, projectId: number) => Promise<void>;
   onGenerateRequirements: () => void;
   showFiles: boolean;
   collapsed: boolean;
@@ -24,6 +28,10 @@ interface ChatAreaProps {
 }
 
 export function ChatArea({
+  chatMessages,
+  loading,
+  error,
+  onSendMessage,
   onGenerateRequirements,
   showFiles,
   collapsed,
@@ -32,11 +40,21 @@ export function ChatArea({
   projectId
 }: ChatAreaProps) {
   const t = getTranslations(language);
-  const [messages, setMessages] = useState<MessageModel[]>(messageMock as MessageModel[]);
   const [inputValue, setInputValue] = useState("");
+  const { state: smState } = useStateMachine();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Mock de archivos de configuración subidos
+  // Ref para el contenedor de mensajes (scrollable)
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = messagesContainerRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [chatMessages]);
+
+  // Mock para archivos de configuración
   const uploadedConfigFilesMock = [
     { id: 1, name: "requisitos_api.docx" },
     { id: 2, name: "ejemplo_requisitos.md" }
@@ -44,39 +62,22 @@ export function ChatArea({
   const [selectedConfigFile, setSelectedConfigFile] = useState<number | "">("");
   const [exampleRequirementsText, setExampleRequirementsText] = useState<string>("");
 
-  const handleSendMessage = () => {
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
-
-    const newMessage: MessageModel = {
-      id: Date.now().toString(),
+    const msgToSend = {
       content: inputValue,
-      sender: 'user',
-      timestamp: new Date(),
-      state: "init",
-      project_id: projectId
+      sender: "user" as const,
+      project_id: projectId,
+      state: smState
     };
-
-    setMessages(prev => [...prev, newMessage]);
+    await onSendMessage(msgToSend, projectId);
     setInputValue("");
-
-    // Simula respuesta de la IA
-    setTimeout(() => {
-      const aiResponse: MessageModel = {
-        id: (Date.now() + 1).toString(),
-        content: t.aiResponseMessage,
-        sender: 'ai',
-        timestamp: new Date(),
-        state: "init",
-        project_id: projectId
-      };
-      setMessages(prev => [...prev, aiResponse]);
-    }, 1000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      handleSend();
     }
   };
 
@@ -114,37 +115,63 @@ export function ChatArea({
           {/* Chat (60%) */}
           <Box flex={3} minWidth={0} height="100%" display="flex" flexDirection="column">
             {/* Mensajes */}
-            <Box flex={1} minHeight={0} maxHeight="45vh" overflow="auto" mb={1}>
-              <Stack spacing={2}>
-                {messages.map((message) => (
-                  <Box
-                    key={message.id}
-                    display="flex"
-                    justifyContent={message.sender === 'user' ? "flex-end" : "flex-start"}
-                  >
-                    <Paper
-                      sx={{
-                        maxWidth: "80%",
-                        px: 2,
-                        py: 1.5,
-                        bgcolor: message.sender === 'user'
-                          ? "primary.main"
-                          : "background.default",
-                        color: message.sender === 'user'
-                          ? "primary.contrastText"
-                          : "text.primary",
-                        borderRadius: 2
-                      }}
-                      elevation={message.sender === 'user' ? 3 : 1}
+            <Box
+              ref={messagesContainerRef}
+              flex={1}
+              minHeight={0}
+              maxHeight="45vh"
+              overflow="auto"
+              mb={1}
+            >
+              {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+                  <CircularProgress size={32} />
+                </Box>
+              ) : error ? (
+                <Alert severity="error">{error}</Alert>
+              ) : (
+                <Stack spacing={2}>
+                  {chatMessages.map((message) => (
+                    <Box
+                      key={message.id}
+                      display="flex"
+                      justifyContent={message.sender === 'user' ? "flex-end" : "flex-start"}
                     >
-                      <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>{message.content}</Typography>
-                      <Typography variant="caption" sx={{ opacity: 0.6, display: "block", mt: 1 }}>
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </Typography>
-                    </Paper>
-                  </Box>
-                ))}
-              </Stack>
+                      <Paper
+                        sx={{
+                          maxWidth: "80%",
+                          px: 2,
+                          py: 1.5,
+                          bgcolor: message.sender === 'user'
+                            ? "primary.main"
+                            : "background.default",
+                          color: message.sender === 'user'
+                            ? "primary.contrastText"
+                            : "text.primary",
+                          borderRadius: 2
+                        }}
+                        elevation={message.sender === 'user' ? 3 : 1}
+                      >
+                        <ReactMarkdown
+                          children={message.content}
+                          components={{
+                            p: props => <Typography variant="body2" sx={{ mb: 0.5 }}>{props.children}</Typography>,
+                            ul: props => <ul style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ul>,
+                            ol: props => <ol style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ol>,
+                            li: props => <li><Typography variant="body2" component="span">{props.children}</Typography></li>,
+                            code: props => <code style={{ background: "#eee", borderRadius: 4, padding: "0 4px" }}>{props.children}</code>
+                          }}
+                        />
+                        <Typography variant="caption" sx={{ opacity: 0.6, display: "block", mt: 1 }}>
+                          {message.timestamp instanceof Date
+                            ? message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                            : new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </Typography>
+                      </Paper>
+                    </Box>
+                  ))}
+                </Stack>
+              )}
             </Box>
             {/* Input */}
             <Box display="flex" alignItems="end" gap={2} pt={2} pb={1}>
@@ -159,6 +186,7 @@ export function ChatArea({
                 variant="outlined"
                 size="small"
                 sx={{ bgcolor: "background.paper" }}
+                disabled={loading}
               />
               <Stack spacing={1}>
                 <Button
@@ -167,14 +195,16 @@ export function ChatArea({
                   onClick={onGenerateRequirements}
                   title={t.analyzeWithAI}
                   size="small"
+                  disabled={loading}
                 >
                   <SparklesIcon fontSize="small" />
                 </Button>
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleSendMessage}
+                  onClick={handleSend}
                   size="small"
+                  disabled={loading || !inputValue.trim()}
                 >
                   <SendIcon fontSize="small" />
                 </Button>
@@ -210,8 +240,8 @@ export function ChatArea({
               {/* Campo de texto multilinea para ejemplos de requisitos */}
               <Box flex={1} display="flex" flexDirection="column">
                 <Typography variant="subtitle2" fontWeight="medium" mb={1}>
-                    {t.exampleRequirementsTitle}
-                </Typography>           
+                  {t.exampleRequirementsTitle}
+                </Typography>
                 <TextField
                   multiline
                   minRows={7}
@@ -224,7 +254,7 @@ export function ChatArea({
                   sx={{ flex: 1, mb: 1 }}
                 />
                 <Typography variant="caption" color="text.secondary">
-                    {t.exampleRequirementsNote}
+                  {t.exampleRequirementsNote}
                 </Typography>
               </Box>
             </Box>
