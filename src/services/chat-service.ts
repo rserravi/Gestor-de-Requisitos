@@ -23,20 +23,24 @@ export async function fetchProjectMessages(
   const { data } = await api.get(`/chat_messages/project/${projectId}`);
   const messages: MessageModel[] = data.map(mapBackendToMessage);
 
-  // Si hay callback, sincroniza el estado machine al último mensaje
   if (messages.length > 0 && typeof onStateDetected === "function") {
     const lastMsg = messages[messages.length - 1];
     if (lastMsg.state) onStateDetected(lastMsg.state);
   }
-
   return messages;
 }
 
-// Enviar mensaje
+// Enviar mensaje (añadimos language automáticamente)
 export async function sendMessage(
   msg: Omit<MessageModel, "id" | "timestamp">
 ): Promise<MessageModel> {
-  const { data } = await api.post("/chat_messages/", msg, {
+  const language = typeof navigator !== "undefined" && navigator.language
+    ? navigator.language
+    : "es-ES";
+
+  const payload = { ...msg, language };
+
+  const { data } = await api.post("/chat_messages/", payload, {
     headers: { "Content-Type": "application/json" },
   });
   return mapBackendToMessage(data);

@@ -14,7 +14,7 @@ import { getMe, logout } from "./services/auth-service";
 import { listProjects, createProject } from "./services/project-service";
 import { fetchProjectMessages, sendMessage } from "./services/chat-service";
 import type { MessageModel } from "./models/message-model";
-import { Dialog, DialogContent, CircularProgress, Typography, Backdrop } from "@mui/material";
+import { CircularProgress, Typography, Backdrop } from "@mui/material";
 import { addStateMachineEntry } from "./services/state-machine-service";
 
 interface AppProps {
@@ -157,23 +157,29 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   };
 
   // Handler para Analizar con IA
-  const handleAnalyzeWithAI = async () => {
-    if (!activeProject?.id) return;
-    setLoadingChat(true);            // <- muestra el Backdrop
-    setErrorChat(null);
-    try {
-      // Cambia el estado en backend
-      await addStateMachineEntry(activeProject.id, "analyze_requisites");
-      // Opcional: reflejar inmediato en UI (el fetch también lo sincroniza)
-      setSmState("analyze_requisites");
-      // Recarga mensajes (esto también re-sincroniza el estado por el callback)
-      await reloadMessages();
-    } catch (e) {
-      setErrorChat("No se pudo analizar con IA.");
-    } finally {
-      setLoadingChat(false);         // <- cierra el Backdrop
-    }
-  };
+const handleAnalyzeWithAI = async () => {
+  if (!activeProject?.id) return;
+  setLoadingChat(true);
+  setErrorChat(null);
+  try {
+    // Deriva a código corto (es, en, ca, ...)
+    const langShort = (language || "es").split("-")[0];
+
+    await addStateMachineEntry(activeProject.id, "analyze_requisites", {
+      language: langShort,
+    });
+
+    // Opcional: reflejar de inmediato
+    setSmState("analyze_requisites");
+
+    // Recarga mensajes (sincroniza state también)
+    await reloadMessages();
+  } catch (e) {
+    setErrorChat("No se pudo analizar con IA.");
+  } finally {
+    setLoadingChat(false);
+  }
+};
 
   // Handler para crear nuevo proyecto desde SideMenu
   const handleProjectCreated = async (name: string, description: string) => {
