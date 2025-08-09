@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import {
-  Paper, Box, Stack, Typography, IconButton, Button, Collapse, TextField, CircularProgress, Alert
+  Paper, Box, Stack, Typography, IconButton, Button, Collapse, TextField, Alert
 } from "@mui/material";
 import {
   Send as SendIcon,
@@ -16,10 +16,10 @@ import { useStateMachine } from "../context/StateMachineContext";
 
 interface ChatAreaProps {
   chatMessages: MessageModel[];
-  loading: boolean;
+  loading: boolean; // Solo para deshabilitar inputs; el Backdrop lo maneja App
   error: string | null;
   onSendMessage: (msg: Omit<MessageModel, "id" | "timestamp">, projectId: number) => Promise<void>;
-  onGenerateRequirements: () => void;
+  onGenerateRequirements: () => void; // App hará el POST a /state_machine y gestionará loading/backdrop
   showFiles: boolean;
   collapsed: boolean;
   onToggleCollapse: () => void;
@@ -42,19 +42,15 @@ export function ChatArea({
   const t = getTranslations(language);
   const [inputValue, setInputValue] = useState("");
   const { state: smState } = useStateMachine();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Ref para el contenedor de mensajes (scrollable)
+  // scroll sólo del área de mensajes
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const el = messagesContainerRef.current;
-    if (el) {
-      el.scrollTop = el.scrollHeight;
-    }
+    if (el) el.scrollTop = el.scrollHeight;
   }, [chatMessages]);
 
-  // Mock para archivos de configuración
+  // Mock combo archivos configuración
   const uploadedConfigFilesMock = [
     { id: 1, name: "requisitos_api.docx" },
     { id: 2, name: "ejemplo_requisitos.md" }
@@ -123,54 +119,53 @@ export function ChatArea({
               overflow="auto"
               mb={1}
             >
-              {error ? (
-                <Alert severity="error">{error}</Alert>
-              ) : (
-                <Stack spacing={2}>
-                  {chatMessages.map((message) => (
-                    <Box
-                      key={message.id}
-                      display="flex"
-                      justifyContent={message.sender === 'user' ? "flex-end" : "flex-start"}
-                    >
-                      <Paper
-                        sx={{
-                          maxWidth: "80%",
-                          px: 2,
-                          py: 1.5,
-                          bgcolor: message.sender === 'user'
-                            ? "primary.main"
-                            : "background.default",
-                          color: message.sender === 'user'
-                            ? "primary.contrastText"
-                            : "text.primary",
-                          borderRadius: 2
-                        }}
-                        elevation={message.sender === 'user' ? 3 : 1}
-                      >
-                        <ReactMarkdown
-                          children={message.content}
-                          components={{
-                            p: props => <Typography variant="body2" sx={{ mb: 0.5 }}>{props.children}</Typography>,
-                            ul: props => <ul style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ul>,
-                            ol: props => <ol style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ol>,
-                            li: props => <li><Typography variant="body2" component="span">{props.children}</Typography></li>,
-                            code: props => <code style={{ background: "#eee", borderRadius: 4, padding: "0 4px" }}>{props.children}</code>
-                          }}
-                        />
-                        <Typography variant="caption" sx={{ opacity: 0.6, display: "block", mt: 1 }}>
-                          {message.timestamp instanceof Date
-                            ? message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                            : new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </Typography>
-                      </Paper>
-                    </Box>
-                  ))}
-                </Stack>
+              {error && (
+                <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>
               )}
+              <Stack spacing={2}>
+                {chatMessages.map((message) => (
+                  <Box
+                    key={message.id}
+                    display="flex"
+                    justifyContent={message.sender === 'user' ? "flex-end" : "flex-start"}
+                  >
+                    <Paper
+                      sx={{
+                        maxWidth: "80%",
+                        px: 2,
+                        py: 1.5,
+                        bgcolor: message.sender === 'user'
+                          ? "primary.main"
+                          : "background.default",
+                        color: message.sender === 'user'
+                          ? "primary.contrastText"
+                          : "text.primary",
+                        borderRadius: 2
+                      }}
+                      elevation={message.sender === 'user' ? 3 : 1}
+                    >
+                      <ReactMarkdown
+                        children={message.content}
+                        components={{
+                          p: props => <Typography variant="body2" sx={{ mb: 0.5 }}>{props.children}</Typography>,
+                          ul: props => <ul style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ul>,
+                          ol: props => <ol style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ol>,
+                          li: props => <li><Typography variant="body2" component="span">{props.children}</Typography></li>,
+                          code: props => <code style={{ background: "#eee", borderRadius: 4, padding: "0 4px" }}>{props.children}</code>
+                        }}
+                      />
+                      <Typography variant="caption" sx={{ opacity: 0.6, display: "block", mt: 1 }}>
+                        {message.timestamp instanceof Date
+                          ? message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                          : new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </Typography>
+                    </Paper>
+                  </Box>
+                ))}
+              </Stack>
             </Box>
 
-            {/* Input */}
+            {/* Área de entrada o botón de análisis según estado */}
             {smState === "new_requisites" ? (
               <Box pt={2} pb={1} display="flex" width="100%" justifyContent="center">
                 <Button
@@ -202,6 +197,16 @@ export function ChatArea({
                   disabled={loading}
                 />
                 <Stack spacing={1}>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={onGenerateRequirements}
+                    title={t.analyzeWithAI}
+                    size="small"
+                    disabled={loading}
+                  >
+                    <SparklesIcon fontSize="small" />
+                  </Button>
                   <Button
                     variant="contained"
                     color="primary"
