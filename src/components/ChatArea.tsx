@@ -123,11 +123,7 @@ export function ChatArea({
               overflow="auto"
               mb={1}
             >
-              {loading ? (
-                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                  <CircularProgress size={32} />
-                </Box>
-              ) : error ? (
+              {error ? (
                 <Alert severity="error">{error}</Alert>
               ) : (
                 <Stack spacing={2}>
@@ -173,43 +169,51 @@ export function ChatArea({
                 </Stack>
               )}
             </Box>
+
             {/* Input */}
-            <Box display="flex" alignItems="end" gap={2} pt={2} pb={1}>
-              <TextField
-                multiline
-                minRows={2}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder={t.textareaPlaceholder}
-                fullWidth
-                variant="outlined"
-                size="small"
-                sx={{ bgcolor: "background.paper" }}
-                disabled={loading}
-              />
-              <Stack spacing={1}>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={onGenerateRequirements}
-                  title={t.analyzeWithAI}
-                  size="small"
-                  disabled={loading}
-                >
-                  <SparklesIcon fontSize="small" />
-                </Button>
+            {smState === "new_requisites" ? (
+              <Box pt={2} pb={1} display="flex" width="100%" justifyContent="center">
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleSend}
-                  size="small"
-                  disabled={loading || !inputValue.trim()}
+                  size="large"
+                  fullWidth
+                  onClick={onGenerateRequirements}
+                  startIcon={<SparklesIcon />}
+                  sx={{ py: 2, fontSize: 18, fontWeight: 500 }}
+                  disabled={loading}
                 >
-                  <SendIcon fontSize="small" />
+                  {t.analyzeWithAI}
                 </Button>
-              </Stack>
-            </Box>
+              </Box>
+            ) : (
+              <Box display="flex" alignItems="end" gap={2} pt={2} pb={1}>
+                <TextField
+                  multiline
+                  minRows={2}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder={t.textareaPlaceholder}
+                  fullWidth
+                  variant="outlined"
+                  size="small"
+                  sx={{ bgcolor: "background.paper" }}
+                  disabled={loading}
+                />
+                <Stack spacing={1}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSend}
+                    size="small"
+                    disabled={loading || !inputValue.trim()}
+                  >
+                    <SendIcon fontSize="small" />
+                  </Button>
+                </Stack>
+              </Box>
+            )}
           </Box>
 
           {/* Lateral: archivos config + requisitos ejemplo (40%) */}

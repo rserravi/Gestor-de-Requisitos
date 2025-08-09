@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Route, Routes, useNavigate, Navigate } from "react-router-dom";
+import { Route, Routes, useNavigate, Navigate, useLocation } from "react-router-dom";
 import Box from "@mui/material/Box";
 import { Header } from "./components/Header";
 import { SideMenu } from "./components/SideMenu";
@@ -14,6 +14,7 @@ import { getMe, logout } from "./services/auth-service";
 import { listProjects, createProject } from "./services/project-service";
 import { fetchProjectMessages, sendMessage } from "./services/chat-service";
 import type { MessageModel } from "./models/message-model";
+import { Dialog, DialogContent, CircularProgress, Typography, Backdrop } from "@mui/material";
 
 interface AppProps {
   isDarkMode: boolean;
@@ -38,6 +39,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   const [errorChat, setErrorChat] = useState<string | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { state: smState, setState: setSmState } = useStateMachine();
 
   // Lógica de visibilidad
@@ -47,8 +49,21 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
     smState === "analyze_requisites" ||
     smState === "stall";
 
-  const showRequirements =
-    smState !== "init" && smState !== "software_questions";
+  const showRequirements = smState !== "init" && smState !== "software_questions";
+
+  // Redirección automática si el token expira (evento disparado por interceptor global)
+  useEffect(() => {
+    const onExpired = () => {
+      logout();
+      setUser(null);
+      setProjects([]);
+      setActiveProject(null);
+      setLoadingChat(false); // por si el modal estaba abierto
+      navigate("/login", { replace: true });
+    };
+    window.addEventListener("auth:expired", onExpired);
+    return () => window.removeEventListener("auth:expired", onExpired);
+  }, [navigate]);
 
   // Recupera usuario al cargar App
   useEffect(() => {
@@ -57,17 +72,20 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
       try {
         const userData = await getMe();
         setUser(userData);
-        setLoadingUser(false);
       } catch {
+        logout(); // asegúrate de limpiar token
         setUser(null);
+        navigate("/login", { replace: true });
+      } finally {
         setLoadingUser(false);
-        navigate("/login");
       }
     };
-    if (localStorage.getItem("access_token")) fetchUser();
-    else {
+
+    if (localStorage.getItem("access_token")) {
+      fetchUser();
+    } else {
       setLoadingUser(false);
-      navigate("/login");
+      navigate("/login", { replace: true });
     }
     // eslint-disable-next-line
   }, []);
@@ -78,13 +96,16 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
       listProjects()
         .then(projs => {
           setProjects(projs);
-          setActiveProject(projs.length > 0 ? projs[projs.length - 1] : null); // Selecciona el último
-          setOpenNewProjectModal(projs.length === 0); // Abre modal si ninguno
+          setActiveProject(projs.length > 0 ? projs[projs.length - 1] : null); // último
+          setOpenNewProjectModal(projs.length === 0); // abre modal si ninguno
         })
         .catch(() => {
           setProjects([]);
           setActiveProject(null);
         });
+    } else {
+      setProjects([]);
+      setActiveProject(null);
     }
   }, [user]);
 
@@ -109,6 +130,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
       );
       setChatMessages(messages);
     } catch (e: any) {
+      // Si fue 401, el interceptor ya navegó; aquí solo limpiamos estado local
       setChatMessages([]);
       setErrorChat("No se pudieron cargar los mensajes.");
     } finally {
@@ -170,7 +192,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
           setProjects([]);
           setActiveProject(null);
           setIsMenuOpen(false);
-          navigate("/login");
+          navigate("/login", { replace: true });
         }}
         language={language as "en" | "es" | "ca"}
         onSettings={() => {
@@ -202,18 +224,34 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
           {/* Login siempre accesible */}
           <Route
             path="/login"
-            element={
-              user
-                ? <Navigate to="/" replace />
-                : <LoginPage />
-            }
+            element={user ? <Navigate to="/" replace /> : <LoginPage />}
           />
+
           {/* Ruta principal, protegida */}
           <Route
             path="/"
             element={
               user ? (
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2, flex: 1, minHeight: 0 }}>
+                  {/* MODAL bloqueante SOLO dentro de zona protegida */}
+                  <Backdrop
+                    sx={{
+                      color: "#fff",
+                      zIndex: (theme) => theme.zIndex.drawer + 1,
+                      flexDirection: "column",
+                      textAlign: "center",
+                    }}
+                    open={loadingChat}
+                  >
+                    <CircularProgress color="inherit" sx={{ mb: 2 }} />
+                    <Typography variant="h6">
+                      Su respuesta está siendo procesada por la IA.
+                    </Typography>
+                    <Typography variant="body2" color="inherit" sx={{ mt: 1 }}>
+                      Podría tardar hasta un minuto. Por favor, espere...
+                    </Typography>
+                  </Backdrop>
+
                   {/* ChatArea */}
                   <Box sx={{ flexShrink: 0, minHeight: 0 }}>
                     <ChatArea
@@ -229,6 +267,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                       projectId={activeProject?.id || 0}
                     />
                   </Box>
+
                   {/* RequirementsTable */}
                   {showRequirements && activeProject && (
                     <Box sx={{ flex: 1, minHeight: 0, overflow: "hidden" }}>
@@ -247,6 +286,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
               )
             }
           />
+
           {/* Ruta configuración, protegida */}
           <Route
             path="/settings"
@@ -263,7 +303,8 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
               )
             }
           />
-          {/* Fallback: redirige a login */}
+
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Box>

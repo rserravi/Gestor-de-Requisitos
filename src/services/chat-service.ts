@@ -1,3 +1,5 @@
+// services/chat-service.ts
+import { api } from "./api";
 import type { MessageModel } from "../models/message-model";
 import type { StateMachineState } from "../context/StateMachineContext";
 
@@ -18,41 +20,24 @@ export async function fetchProjectMessages(
   projectId: number,
   onStateDetected?: (state: StateMachineState) => void
 ): Promise<MessageModel[]> {
-  const token = localStorage.getItem("access_token");
-  const res = await fetch(
-    `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/chat_messages/project/${projectId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-  if (!res.ok) throw new Error("No se pudieron cargar los mensajes.");
-  const data = await res.json();
-  const messages = data.map(mapBackendToMessage);
+  const { data } = await api.get(`/chat_messages/project/${projectId}`);
+  const messages: MessageModel[] = data.map(mapBackendToMessage);
 
   // Si hay callback, sincroniza el estado machine al último mensaje
   if (messages.length > 0 && typeof onStateDetected === "function") {
     const lastMsg = messages[messages.length - 1];
-    if (lastMsg.state) {
-      onStateDetected(lastMsg.state);
-    }
+    if (lastMsg.state) onStateDetected(lastMsg.state);
   }
 
   return messages;
 }
 
 // Enviar mensaje
-export async function sendMessage(msg: Omit<MessageModel, "id" | "timestamp">): Promise<MessageModel> {
-  const token = localStorage.getItem("access_token");
-  const res = await fetch(
-    `${import.meta.env.VITE_API_URL || "http://localhost:8000"}/chat_messages/`,
-    {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(msg),
-    }
-  );
-  if (!res.ok) throw new Error("No se pudo enviar el mensaje.");
-  const data = await res.json();
+export async function sendMessage(
+  msg: Omit<MessageModel, "id" | "timestamp">
+): Promise<MessageModel> {
+  const { data } = await api.post("/chat_messages/", msg, {
+    headers: { "Content-Type": "application/json" },
+  });
   return mapBackendToMessage(data);
 }
