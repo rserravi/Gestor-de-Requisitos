@@ -57,9 +57,9 @@ export function LoginPage() {
             message = data.message;
           }
         }
-        setError(message || "Error");
+        setError(message || t.genericError);
       } else {
-        setError(err.message || "Error");
+        setError(err.message || t.genericError);
       }
     }
   };

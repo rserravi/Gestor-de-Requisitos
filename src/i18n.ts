@@ -10,6 +10,7 @@ const translations: Record<Language, Translations> = {
     // App
     processingResponse: "Your response is being processed by the AI.",
     processingWait: "It may take up to a minute. Please wait...",
+    genericError: "Error",
     errorLoadMessages: "Failed to load messages.",
     errorSendMessage: "Failed to send the message.",
     errorAnalyzeAI: "Failed to analyze with AI.",
@@ -173,6 +174,7 @@ const translations: Record<Language, Translations> = {
     // App
     processingResponse: "Su respuesta está siendo procesada por la IA.",
     processingWait: "Podría tardar hasta un minuto. Por favor, espere...",
+    genericError: "Error",
     errorLoadMessages: "No se pudieron cargar los mensajes.",
     errorSendMessage: "No se pudo enviar el mensaje.",
     errorAnalyzeAI: "No se pudo analizar con IA.",
@@ -336,6 +338,7 @@ const translations: Record<Language, Translations> = {
     // App
     processingResponse: "La teva resposta està sent processada per la IA.",
     processingWait: "Podria trigar fins a un minut. Si us plau, espera...",
+    genericError: "Error",
     errorLoadMessages: "No s'han pogut carregar els missatges.",
     errorSendMessage: "No s'ha pogut enviar el missatge.",
     errorAnalyzeAI: "No s'ha pogut analitzar amb IA.",
