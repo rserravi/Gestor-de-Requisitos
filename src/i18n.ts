@@ -1,6 +1,7 @@
 export type Language = "en" | "es" | "ca";
 
 type Translations = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any; // Usamos 'any' para anidar objetos de traducción
 };
 
@@ -12,6 +13,7 @@ const translations: Record<Language, Translations> = {
     errorLoadMessages: "Failed to load messages.",
     errorSendMessage: "Failed to send the message.",
     errorAnalyzeAI: "Failed to analyze with AI.",
+    errorLoadUser: "Error loading user",
 
     // ChatArea
     chatTitle: "AI Assistant",
@@ -174,6 +176,7 @@ const translations: Record<Language, Translations> = {
     errorLoadMessages: "No se pudieron cargar los mensajes.",
     errorSendMessage: "No se pudo enviar el mensaje.",
     errorAnalyzeAI: "No se pudo analizar con IA.",
+    errorLoadUser: "No se pudo cargar el usuario",
 
     // ChatArea
     chatTitle: "Asistente IA",
@@ -336,6 +339,7 @@ const translations: Record<Language, Translations> = {
     errorLoadMessages: "No s'han pogut carregar els missatges.",
     errorSendMessage: "No s'ha pogut enviar el missatge.",
     errorAnalyzeAI: "No s'ha pogut analitzar amb IA.",
+    errorLoadUser: "No s'ha pogut carregar l'usuari",
 
     // ChatArea
     chatTitle: "Assistent IA",
