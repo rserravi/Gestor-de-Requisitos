@@ -19,7 +19,7 @@ import type { ChatMessageCreatePayload } from "../services/chat-service";
 interface ChatAreaProps {
   chatMessages: MessageModel[];
   loading: boolean; // lo usa App para Backdrop; aquí solo deshabilitamos inputs
-  error: string | null;
+  error?: string | null;
   onSendMessage: (msg: ChatMessageCreatePayload, projectId: number) => Promise<void>;
   onGenerateRequirements: () => void;
   showFiles: boolean;
@@ -27,6 +27,7 @@ interface ChatAreaProps {
   onToggleCollapse: () => void;
   language: Language;
   projectId: number;
+  onError?: (msg: string | null) => void;
 }
 
 export function ChatArea({
@@ -39,10 +40,12 @@ export function ChatArea({
   collapsed,
   onToggleCollapse,
   language,
-  projectId
+  projectId,
+  onError
 }: ChatAreaProps) {
   const t = getTranslations(language);
   const [inputValue, setInputValue] = useState("");
+  const [internalError, setInternalError] = useState<string | null>(null);
   const { state: smState } = useStateMachine();
 
   // scroll solo del área de mensajes
@@ -92,8 +95,16 @@ export function ChatArea({
       }
     }
 
-    await onSendMessage(payload, projectId);
-    setInputValue("");
+    setInternalError(null);
+    onError?.(null);
+    try {
+      await onSendMessage(payload, projectId);
+      setInputValue("");
+    } catch {
+      const msg = t.sendErrorMessage;
+      setInternalError(msg);
+      onError?.(msg);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -151,7 +162,11 @@ export function ChatArea({
               overflow="auto"
               mb={1}
             >
-              {error && <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>}
+              {(error || internalError) && (
+                <Alert severity="error" sx={{ mb: 1 }}>
+                  {error || internalError}
+                </Alert>
+              )}
 
               <Stack spacing={2}>
                 {chatMessages.map((message) => (

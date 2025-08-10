@@ -149,8 +149,6 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
     try {
       await sendMessage(msg);
       await reloadMessages();
-    } catch (e: any) {
-      setErrorChat("No se pudo enviar el mensaje.");
     } finally {
       setLoadingChat(false);
     }
@@ -292,6 +290,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                       onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
                       language={language as "en" | "es" | "ca"}
                       projectId={activeProject?.id || 0}
+                      onError={setErrorChat}
                     />
                   </Box>
 
