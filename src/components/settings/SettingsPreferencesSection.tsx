@@ -20,7 +20,7 @@ interface SettingsPreferencesSectionProps {
   user: UserModel;
   onUpdate?: (user: UserModel) => void;
   language: Language;
-  onLanguageChange: (lang: string) => void;
+  onLanguageChange: (lang: Language) => void;
 }
 
 export function SettingsPreferencesSection({ user, onUpdate, language, onLanguageChange }: SettingsPreferencesSectionProps) {
@@ -60,7 +60,7 @@ export function SettingsPreferencesSection({ user, onUpdate, language, onLanguag
             labelId="language-label"
             value={language}
             label={t.settingsPrefsLangLabel}
-            onChange={e => onLanguageChange(e.target.value)}
+            onChange={e => onLanguageChange(e.target.value as Language)}
           >
             <MenuItem value="es">Español</MenuItem>
             <MenuItem value="en">English</MenuItem>
