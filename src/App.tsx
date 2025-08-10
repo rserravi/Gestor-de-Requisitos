@@ -17,6 +17,7 @@ import { fetchProjectMessages, sendMessage, type ChatMessageCreatePayload } from
 import type { MessageModel } from "./models/message-model";
 import { CircularProgress, Typography, Backdrop } from "@mui/material";
 import { addStateMachineEntry } from "./services/state-machine-service";
+import { generateRequirement } from "./services/requirements-service";
 
 interface AppProps {
   isDarkMode: boolean;
@@ -192,6 +193,29 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
     }
   };
 
+  // Handler para generar requisito con IA
+  const handleGenerateRequirement = async (
+    category: string,
+    examples?: string[]
+  ) => {
+    if (!activeProject?.id) return;
+    setLoadingChat(true);
+    setErrorChat(null);
+    try {
+      await generateRequirement(
+        activeProject.id,
+        category,
+        language,
+        examples && examples.length > 0 ? examples : undefined
+      );
+      await reloadMessages();
+    } catch (e) {
+      setErrorChat(t.errorCreateRequirement);
+    } finally {
+      setLoadingChat(false);
+    }
+  };
+
   // Handler para crear nuevo proyecto desde SideMenu
   const handleProjectCreated = async (name: string, description: string) => {
     await createProject({ name, description });
@@ -297,6 +321,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                       error={errorChat}
                       onSendMessage={handleSendMessage}
                       onGenerateRequirements={handleAnalyzeWithAI}
+                      onAddRequirement={handleGenerateRequirement}
                       showFiles={showFiles}
                       collapsed={isChatCollapsed}
                       onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
