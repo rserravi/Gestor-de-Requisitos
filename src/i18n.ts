@@ -31,6 +31,7 @@ const translations: Record<Language, Translations> = {
     exampleRequirementsNote: "The content will be sent automatically to the AI when generating requirements. You don't need to save.",
     chatStallAddFunctional: "Add Functional Req.",
     chatStallAddNonFunctional: "Add Non-Functional Req.",
+    sendErrorMessage: "Message could not be sent. Please try again.",
 
     // RequirementsTable
     requirementsTableTitle: "Requirements Table",
@@ -191,6 +192,7 @@ const translations: Record<Language, Translations> = {
     exampleRequirementsNote: "El contenido se enviará automáticamente a la IA al generar requisitos. No necesitas guardar.",
     chatStallAddFunctional: "Añadir R. Funcional",
     chatStallAddNonFunctional: "Añadir R. No Funcional",
+    sendErrorMessage: "No se pudo enviar el mensaje. Por favor, inténtalo de nuevo.",
 
     // RequirementsTable
     requirementsTableTitle: "Tabla de Requisitos",
@@ -351,6 +353,7 @@ const translations: Record<Language, Translations> = {
     exampleRequirementsNote: "El contingut s'enviarà automàticament a la IA en generar requisits. No cal que desis.",
     chatStallAddFunctional: "Afegir R. Funcional",
     chatStallAddNonFunctional: "Afegir R. No Funcional",
+    sendErrorMessage: "No s'ha pogut enviar el missatge. Si us plau, torna-ho a intentar.",
 
     // RequirementsTable
     requirementsTableTitle: "Taula de Requisits",

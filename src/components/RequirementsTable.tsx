@@ -218,7 +218,12 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
           >
             {t.addRequirement}
           </Button>
-          <IconButton onClick={onToggleCollapse} size="small" title={collapsed ? t.expand : t.collapse}>
+          <IconButton
+            onClick={onToggleCollapse}
+            size="small"
+            title={collapsed ? t.expand : t.collapse}
+            aria-label={collapsed ? t.expand : t.collapse}
+          >
             {collapsed ? <ExpandMore /> : <ExpandLess />}
           </IconButton>
         </Box>
@@ -454,7 +459,12 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
                       )}
                     </TableCell>
                     <TableCell>
-                      <IconButton color="default" size="small" title={t.viewVisual}>
+                      <IconButton
+                        color="default"
+                        size="small"
+                        title={t.viewVisual}
+                        aria-label={t.viewVisual}
+                      >
                         <ImageIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
@@ -462,22 +472,41 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
                       <Stack direction="row" spacing={1}>
                         {editingId === requirement.id ? (
                           <>
-                            <IconButton color="primary" size="small" onClick={saveEdit} title={t.saveChanges}>
+                            <IconButton
+                              color="primary"
+                              size="small"
+                              onClick={saveEdit}
+                              title={t.saveChanges}
+                              aria-label={t.saveChanges}
+                            >
                               <SaveIcon fontSize="small" />
                             </IconButton>
-                            <IconButton color="default" size="small" onClick={cancelEdit} title={t.cancelEdit}>
+                            <IconButton
+                              color="default"
+                              size="small"
+                              onClick={cancelEdit}
+                              title={t.cancelEdit}
+                              aria-label={t.cancelEdit}
+                            >
                               <CloseIcon fontSize="small" />
                             </IconButton>
                           </>
                         ) : (
                           <>
-                            <IconButton color="primary" size="small" onClick={() => startEdit(requirement)} title={t.editRequirement}>
+                            <IconButton
+                              color="primary"
+                              size="small"
+                              onClick={() => startEdit(requirement)}
+                              title={t.editRequirement}
+                              aria-label={t.editRequirement}
+                            >
                               <EditIcon fontSize="small" />
                             </IconButton>
                             <IconButton
                               color="error"
                               size="small"
                               title={t.deleteRequirement}
+                              aria-label={t.deleteRequirement}
                               onClick={() => handleDelete(requirement.id)}
                             >
                               <DeleteIcon fontSize="small" />

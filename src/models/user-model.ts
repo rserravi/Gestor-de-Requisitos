@@ -1,3 +1,5 @@
+import type { Language } from "../i18n";
+
 export type UserModel = {
     id: number;
     username: string;
@@ -16,7 +18,7 @@ export type UserModel = {
 export type UserPreferences = {
     theme: string;
     notifications: boolean;
-    language: string;
+    language: Language;
     timezone: string;
 };
 

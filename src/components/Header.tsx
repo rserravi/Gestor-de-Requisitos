@@ -14,8 +14,8 @@ interface HeaderProps {
   isDarkMode: boolean;
   onToggleDarkMode: () => void;
   onToggleMenu: () => void;
-  language: string;
-  onLanguageChange: (language: string) => void;
+  language: Language;
+  onLanguageChange: (language: Language) => void;
 }
 
 export function Header({
@@ -26,7 +26,7 @@ export function Header({
   language,
   onLanguageChange
 }: HeaderProps) {
-  const t = getTranslations(language as Language);
+  const t = getTranslations(language);
 
   return (
     <AppBar
@@ -64,7 +64,7 @@ export function Header({
           <LanguageIcon sx={{ mr: 1 }} fontSize="small" />
           <Select
             value={language}
-            onChange={(e) => onLanguageChange(e.target.value as string)}
+            onChange={(e) => onLanguageChange(e.target.value as Language)}
             size="small"
             variant="standard"
             disableUnderline

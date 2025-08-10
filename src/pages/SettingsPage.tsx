@@ -21,7 +21,7 @@ interface SettingsPageProps {
   user: UserModel;
   onUpdate?: (user: UserModel) => void;
   language: Language;
-  onLanguageChange: (lang: string) => void;
+  onLanguageChange: (lang: Language) => void;
 }
 
 export function SettingsPage({ user, onUpdate, language, onLanguageChange }: SettingsPageProps) {
