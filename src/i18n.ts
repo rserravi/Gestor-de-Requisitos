@@ -139,6 +139,7 @@ const translations: Record<Language, Translations> = {
     settingsPrefsTimezoneLabel: "Timezone",
     settingsPrefsNotificationsLabel: "Notifications",
     settingsPrefsSave: "Save changes",
+    settingsSaved: "Changes saved",
 
     // Settings - Example Files Section
     settingsFilesTitle: "Example Files",
@@ -300,6 +301,7 @@ const translations: Record<Language, Translations> = {
     settingsPrefsTimezoneLabel: "Zona Horaria",
     settingsPrefsNotificationsLabel: "Notificaciones",
     settingsPrefsSave: "Guardar cambios",
+    settingsSaved: "Cambios guardados",
 
     // Settings - Example Files Section
     settingsFilesTitle: "Archivos de Ejemplo",
@@ -461,6 +463,7 @@ const translations: Record<Language, Translations> = {
     settingsPrefsTimezoneLabel: "Zona Horària",
     settingsPrefsNotificationsLabel: "Notificacions",
     settingsPrefsSave: "Desar canvis",
+    settingsSaved: "Canvis desats",
 
     // Settings - Example Files Section
     settingsFilesTitle: "Fitxers d'Exemple",

@@ -6,7 +6,9 @@ import {
   Button,
   TextField,
   Stack,
-  Typography
+  Typography,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
 import SaveIcon from "@mui/icons-material/Save";
@@ -24,6 +26,7 @@ export function SettingsUserSection({ user, onUpdate, language }: SettingsUserSe
   const [email, setEmail] = useState(user.email);
   const [avatar, setAvatar] = useState(user.avatar);
   const [isSaving, setIsSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const t = getTranslations(language);
 
@@ -61,6 +64,7 @@ export function SettingsUserSection({ user, onUpdate, language }: SettingsUserSe
         avatar
       });
       onUpdate(updatedUser);
+      setShowSuccess(true);
     } catch (error) {
       console.error("Error updating user", error);
     } finally {
@@ -118,6 +122,19 @@ export function SettingsUserSection({ user, onUpdate, language }: SettingsUserSe
           {isSaving ? t.settingsUserSaving : t.settingsUserSave}
         </Button>
       </Stack>
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccess(false)}
+      >
+        <Alert
+          onClose={() => setShowSuccess(false)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {t.settingsSaved}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
