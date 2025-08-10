@@ -83,7 +83,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
     setLoading(true);
     fetchProjectRequirements(projectId)
       .then(setRequirements)
-      .catch(() => setError("No se pudieron cargar los requisitos"))
+      .catch(() => setError(t.errorLoadRequirements))
       .finally(() => setLoading(false));
   }, [projectId]);
 
@@ -143,7 +143,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
       setEditingId(null);
       setEditForm({});
     } catch (err: any) {
-      setError("No se pudo actualizar el requisito");
+      setError(t.errorUpdateRequirement);
     } finally {
       setLoading(false);
     }
@@ -156,7 +156,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
       await deleteRequirementApi(id);
       setRequirements(prev => prev.filter(req => req.id !== id));
     } catch (err: any) {
-      setError("No se pudo eliminar el requisito");
+      setError(t.errorDeleteRequirement);
     } finally {
       setLoading(false);
     }
@@ -177,7 +177,7 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
       setRequirements(prev => [...prev, created]);
       startEdit(created);
     } catch (err: any) {
-      setError("No se pudo crear el requisito");
+      setError(t.errorCreateRequirement);
     } finally {
       setLoading(false);
     }

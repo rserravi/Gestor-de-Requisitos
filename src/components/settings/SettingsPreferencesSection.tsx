@@ -62,9 +62,9 @@ export function SettingsPreferencesSection({ user, onUpdate, language, onLanguag
             label={t.settingsPrefsLangLabel}
             onChange={e => onLanguageChange(e.target.value as Language)}
           >
-            <MenuItem value="es">Español</MenuItem>
-            <MenuItem value="en">English</MenuItem>
-            <MenuItem value="ca">Català</MenuItem>
+            <MenuItem value="es">{t.languages.es}</MenuItem>
+            <MenuItem value="en">{t.languages.en}</MenuItem>
+            <MenuItem value="ca">{t.languages.ca}</MenuItem>
           </Select>
         </FormControl>
 

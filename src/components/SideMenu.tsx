@@ -60,7 +60,7 @@ export function SideMenu({
   const handleAddProject = async () => {
     setError("");
     if (!projName.trim()) {
-      setError("El nombre es obligatorio");
+      setError(t.errorProjectNameRequired);
       return;
     }
     setSaving(true);
@@ -74,7 +74,7 @@ export function SideMenu({
       setOpenNewProjectModal(false);
       onClose(); // Cierra SideMenu
     } catch (err: any) {
-      setError("Error al crear el proyecto");
+      setError(t.errorCreateProject);
     } finally {
       setSaving(false);
     }
@@ -209,11 +209,11 @@ export function SideMenu({
         maxWidth="xs"
         fullWidth
       >
-        <DialogTitle>Añadir nuevo proyecto</DialogTitle>
+        <DialogTitle>{t.newProjectTitle}</DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
             <TextField
-              label="Nombre del proyecto"
+              label={t.newProjectNameLabel}
               value={projName}
               onChange={e => setProjName(e.target.value)}
               required
@@ -221,7 +221,7 @@ export function SideMenu({
               autoFocus
             />
             <TextField
-              label="Descripción"
+              label={t.newProjectDescriptionLabel}
               value={projDesc}
               onChange={e => setProjDesc(e.target.value)}
               multiline
@@ -237,14 +237,14 @@ export function SideMenu({
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={handleCancelNewProject} disabled={saving}>
-            Cancelar
+            {t.newProjectCancel}
           </Button>
           <Button
             onClick={handleAddProject}
             variant="contained"
             disabled={saving}
           >
-            {saving ? "Guardando..." : "Crear proyecto"}
+            {saving ? t.newProjectSaving : t.newProjectCreate}
           </Button>
         </DialogActions>
       </Dialog>

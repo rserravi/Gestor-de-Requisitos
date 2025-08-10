@@ -40,7 +40,7 @@ export function Header({
         <IconButton
           edge="start"
           color="inherit"
-          aria-label={t.toggleMenu || "Abrir menú"}
+          aria-label={t.toggleMenu}
           onClick={onToggleMenu}
           sx={{ mr: 2 }}
         >
@@ -69,11 +69,11 @@ export function Header({
             variant="standard"
             disableUnderline
             sx={{ fontWeight: 500, minWidth: 70 }}
-            title={t.selectLanguage || "Seleccionar idioma"}
+            title={t.selectLanguage}
           >
-            <MenuItem value="en">English</MenuItem>
-            <MenuItem value="es">Español</MenuItem>
-            <MenuItem value="ca">Català</MenuItem>
+            <MenuItem value="en">{t.languages.en}</MenuItem>
+            <MenuItem value="es">{t.languages.es}</MenuItem>
+            <MenuItem value="ca">{t.languages.ca}</MenuItem>
           </Select>
         </Box>
 
