@@ -10,7 +10,9 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
-  TextField
+  TextField,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import type { UserModel } from "../../models/user-model";
@@ -29,6 +31,7 @@ export function SettingsPreferencesSection({ user, onUpdate, language, onLanguag
   const [timezone, setTimezone] = useState(user.preferences.timezone);
   const [notifications, setNotifications] = useState(user.preferences.notifications);
   const [isSaving, setIsSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const t = getTranslations(language);
 
   // Comprobar cambios para habilitar botón
@@ -53,6 +56,7 @@ export function SettingsPreferencesSection({ user, onUpdate, language, onLanguag
         ...user,
         preferences: updatedPreferences
       });
+      setShowSuccess(true);
     } catch (error) {
       console.error("Error updating preferences", error);
     } finally {
@@ -124,6 +128,19 @@ export function SettingsPreferencesSection({ user, onUpdate, language, onLanguag
           </Button>
         </Stack>
       </Stack>
+      <Snackbar
+        open={showSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowSuccess(false)}
+      >
+        <Alert
+          onClose={() => setShowSuccess(false)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {t.settingsSaved}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
