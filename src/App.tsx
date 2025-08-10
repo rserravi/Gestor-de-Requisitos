@@ -17,7 +17,6 @@ import { fetchProjectMessages, sendMessage, type ChatMessageCreatePayload } from
 import type { MessageModel } from "./models/message-model";
 import { CircularProgress, Typography, Backdrop } from "@mui/material";
 import { addStateMachineEntry } from "./services/state-machine-service";
-import type { Language } from "./i18n";
 
 interface AppProps {
   isDarkMode: boolean;
@@ -26,8 +25,8 @@ interface AppProps {
 
 export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [language, setLanguage] = useState("es");
-  const t = getTranslations(language as Language);
+  const [language, setLanguage] = useState<Language>("es");
+  const t = getTranslations(language);
 
   const [user, setUser] = useState<UserModel | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
