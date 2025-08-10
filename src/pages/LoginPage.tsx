@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import {
   Box, Paper, TextField, Button, Typography, Stack, Link
 } from "@mui/material";
@@ -39,10 +40,32 @@ export function LoginPage() {
         if (!username || !password) { setError(t.errorUserPasswordRequired); return; }
         await login({ username, password });
         setError("");
-        navigate("/");
+        const token = localStorage.getItem("access_token");
+        if (token) {
+          navigate("/");
+        } else {
+          setError(t.errorMissingToken ?? "Missing access token");
+        }
       }
     } catch (err: any) {
-      setError(err.message || "Error");
+      if (axios.isAxiosError(err)) {
+        const data = err.response?.data as any;
+        let message = err.message;
+        if (data) {
+          if (typeof data === "string") {
+            message = data;
+          } else if (typeof data.detail === "string") {
+            message = data.detail;
+          } else if (Array.isArray(data.detail)) {
+            message = data.detail.map((d: any) => d.msg).join(", ");
+          } else if (typeof data.message === "string") {
+            message = data.message;
+          }
+        }
+        setError(message || "Error");
+      } else {
+        setError(err.message || "Error");
+      }
     }
   };
 
