@@ -1,6 +1,7 @@
 // services/requirements-service.ts
 import { api } from "./api";
 import type { RequirementModel } from "../models/requirements-model";
+import type { Language } from "../i18n";
 
 function mapBackendToRequirement(data: any): RequirementModel {
   return {
@@ -67,4 +68,28 @@ export async function updateRequirement(
 // DELETE requisito
 export async function deleteRequirement(requirementId: string): Promise<void> {
   await api.delete(`/requirements/${requirementId}`);
+}
+
+// POST generar requisito mediante IA
+export async function generateRequirement(
+  projectId: number,
+  category: string,
+  language: Language,
+  exampleSamples?: string[]
+): Promise<any> {
+  const payload: Record<string, any> = {
+    project_id: projectId,
+    category,
+    language,
+  };
+
+  if (exampleSamples && exampleSamples.length > 0) {
+    payload.example_samples = exampleSamples;
+  }
+
+  const { data } = await api.post(`/requirements/generate`, payload, {
+    headers: { "Content-Type": "application/json" },
+  });
+
+  return data;
 }
