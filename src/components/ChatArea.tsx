@@ -15,7 +15,6 @@ import { getTranslations, type Language } from "../i18n";
 import type { MessageModel } from "../models/message-model";
 import { useStateMachine } from "../context/StateMachineContext";
 import type { ChatMessageCreatePayload } from "../services/chat-service";
-import { generateRequirement } from "../services/requirements-service";
 
 interface ChatAreaProps {
   chatMessages: MessageModel[];
@@ -23,6 +22,7 @@ interface ChatAreaProps {
   error?: string | null;
   onSendMessage: (msg: ChatMessageCreatePayload, projectId: number) => Promise<void>;
   onGenerateRequirements: () => void;
+  onAddRequirement: (category: string, examples?: string[]) => Promise<void>;
   showFiles: boolean;
   collapsed: boolean;
   onToggleCollapse: () => void;
@@ -37,6 +37,7 @@ export function ChatArea({
   error,
   onSendMessage,
   onGenerateRequirements,
+  onAddRequirement,
   showFiles,
   collapsed,
   onToggleCollapse,
@@ -119,12 +120,7 @@ export function ChatArea({
     const examples = parseExamples(exampleRequirementsText);
 
     try {
-      await generateRequirement(
-        projectId,
-        category,
-        language,
-        examples.length > 0 ? examples : undefined
-      );
+      await onAddRequirement(category, examples.length > 0 ? examples : undefined);
     } catch (err) {
       console.error(err);
     }
@@ -262,16 +258,6 @@ export function ChatArea({
                     disabled={loading}
                   />
                   <Stack spacing={1}>
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={onGenerateRequirements}
-                      title={t.analyzeWithAI}
-                      size="small"
-                      disabled={loading}
-                    >
-                      <SparklesIcon fontSize="small" />
-                    </Button>
                     <Button
                       variant="contained"
                       color="primary"
