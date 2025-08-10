@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Route, Routes, useNavigate, Navigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Route, Routes, useNavigate, Navigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import { Header } from "./components/Header";
 import { SideMenu } from "./components/SideMenu";
@@ -39,12 +39,13 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   const [isChatCollapsed, setIsChatCollapsed] = useState(false);
   const [isReqsCollapsed, setIsReqsCollapsed] = useState(false);
 
+  const themePrefRef = useRef<string | null>(null);
+
   const [chatMessages, setChatMessages] = useState<MessageModel[]>([]);
   const [loadingChat, setLoadingChat] = useState(false);
   const [errorChat, setErrorChat] = useState<string | null>(null);
 
   const navigate = useNavigate();
-  const location = useLocation();
   const { state: smState, setState: setSmState } = useStateMachine();
 
   // Lógica de visibilidad
@@ -77,8 +78,10 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
       try {
         const userData = await getMe();
         setUser(userData);
-      } catch (err: any) {
-        const status = err?.response?.status;
+      } catch (err: unknown) {
+        const status = (
+          err as { response?: { status?: number } }
+        )?.response?.status;
         if (status === 401 || status === 403) {
           logout(); // asegúrate de limpiar token
           setUser(null);
@@ -103,11 +106,13 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
 
   // Ajusta idioma y tema según preferencias del usuario al iniciar sesión
   useEffect(() => {
-    if (user?.preferences) {
-      // Ajustar idioma
-      setLanguage(user.preferences.language);
+    if (!user?.preferences) return;
 
-      // Determinar modo oscuro deseado
+    // Ajustar idioma
+    setLanguage(user.preferences.language);
+
+    // Solo aplicar tema si la preferencia cambió y aún no se aplicó
+    if (user.preferences.theme !== themePrefRef.current) {
       let shouldBeDark = isDarkMode;
       const prefTheme = user.preferences.theme;
       if (prefTheme === "dark") shouldBeDark = true;
@@ -116,12 +121,14 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
         shouldBeDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       }
 
-      // Cambiar tema si es necesario
       if (shouldBeDark !== isDarkMode) {
         onToggleDarkMode();
       }
+
+      themePrefRef.current = user.preferences.theme;
     }
-  }, [user, isDarkMode, onToggleDarkMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   // Recupera proyectos cuando hay usuario
   useEffect(() => {
@@ -162,7 +169,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
         setSmState // sincroniza state machine con último mensaje
       );
       setChatMessages(messages);
-    } catch (e: any) {
+    } catch {
       // Si fue 401, el interceptor ya navegó; aquí solo limpiamos estado local
       setChatMessages([]);
       setErrorChat(t.errorLoadMessages);
@@ -179,9 +186,12 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
     setLoadingChat(true);
     setErrorChat(null);
     try {
+      if (msg.project_id !== projectId) {
+        msg.project_id = projectId;
+      }
       await sendMessage(msg);
       await reloadMessages();
-    } catch (e: any) {
+    } catch {
       setErrorChat(t.errorSendMessage);
 
     } finally {
@@ -208,7 +218,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
 
       // Recarga mensajes (sincroniza state también)
       await reloadMessages();
-    } catch (e) {
+    } catch {
       setErrorChat(t.errorAnalyzeAI);
     } finally {
       setLoadingChat(false);
@@ -231,7 +241,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
         examples && examples.length > 0 ? examples : undefined
       );
       await reloadMessages();
-    } catch (e) {
+    } catch {
       setErrorChat(t.errorCreateRequirement);
     } finally {
       setLoadingChat(false);
