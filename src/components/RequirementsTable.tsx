@@ -34,6 +34,12 @@ interface RequirementsTableProps {
   language: Language;
   projectId: number;
   ownerId: number;
+  /**
+   * When this value changes the table will reload requirements from the backend.
+   * It allows parent components to trigger a refresh after external actions
+   * such as generating a requirement from the chat area.
+   */
+  reloadTrigger?: number;
 }
 
 const statusColors: Record<RequirementModel['status'], 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'> = {
@@ -50,7 +56,14 @@ const priorityColors: Record<RequirementModel['priority'], 'default' | 'primary'
   wont: "default"
 };
 
-export function RequirementsTable({ collapsed, onToggleCollapse, language, projectId, ownerId }: RequirementsTableProps) {
+export function RequirementsTable({
+  collapsed,
+  onToggleCollapse,
+  language,
+  projectId,
+  ownerId,
+  reloadTrigger = 0,
+}: RequirementsTableProps) {
   const t = getTranslations(language);
   const [requirements, setRequirements] = useState<RequirementModel[]>([]);
   const [loading, setLoading] = useState(false);
@@ -79,13 +92,14 @@ export function RequirementsTable({ collapsed, onToggleCollapse, language, proje
   };
 
   // Cargar requisitos del backend cuando cambia el proyecto
+  // o cuando un componente padre indica que se deben recargar
   useEffect(() => {
     setLoading(true);
     fetchProjectRequirements(projectId)
       .then(setRequirements)
       .catch(() => setError(t.errorLoadRequirements))
       .finally(() => setLoading(false));
-  }, [projectId]);
+  }, [projectId, reloadTrigger, t.errorLoadRequirements]);
 
   // Filtrado + ordenación de requisitos
   const filteredRequirements = useMemo(() => {

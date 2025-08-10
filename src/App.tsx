@@ -38,6 +38,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
 
   const [isChatCollapsed, setIsChatCollapsed] = useState(false);
   const [isReqsCollapsed, setIsReqsCollapsed] = useState(false);
+  const [requirementsReloadTrigger, setRequirementsReloadTrigger] = useState(0);
 
   const themePrefRef = useRef<string | null>(null);
 
@@ -241,6 +242,8 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
         examples && examples.length > 0 ? examples : undefined
       );
       await reloadMessages();
+      // Trigger reload of requirements table to include the new requirement
+      setRequirementsReloadTrigger((v) => v + 1);
     } catch {
       setErrorChat(t.errorCreateRequirement);
     } finally {
@@ -372,6 +375,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                         language={language}
                         ownerId={user.id}
                         projectId={activeProject.id}
+                        reloadTrigger={requirementsReloadTrigger}
                       />
                     </Box>
                   )}
