@@ -141,6 +141,7 @@ export function ChatArea({
         <IconButton
           onClick={onToggleCollapse}
           title={collapsed ? t.expand : t.collapse}
+          aria-label={collapsed ? t.expand : t.collapse}
           size="small"
           sx={{ ml: 1 }}
         >

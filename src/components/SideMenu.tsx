@@ -137,6 +137,7 @@ export function SideMenu({
               color="primary"
               size="small"
               title={t.addProject}
+              aria-label={t.addProject}
               onClick={() => setNewProjectOpen(true)}
             >
               <AddIcon />
