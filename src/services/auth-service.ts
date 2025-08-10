@@ -39,6 +39,10 @@ export async function login({
     headers: { "Content-Type": "application/x-www-form-urlencoded" }
   });
 
+  if (!data || !data.access_token) {
+    throw new Error("Token de acceso no recibido");
+  }
+
   localStorage.setItem("access_token", data.access_token);
   return data;
 }
