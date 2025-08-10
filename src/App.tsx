@@ -89,7 +89,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
           navigate("/login", { replace: true });
         } else {
           console.error(err);
-          alert("Error loading user");
+          alert(t.errorLoadUser);
         }
       } finally {
         setLoadingUser(false);

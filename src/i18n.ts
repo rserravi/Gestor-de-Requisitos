@@ -1,7 +1,7 @@
 export type Language = "en" | "es" | "ca";
 
 type Translations = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allow nested translation objects
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any; // Usamos 'any' para anidar objetos de traducción
 };
 
@@ -351,7 +351,8 @@ const translations: Record<Language, Translations> = {
     genericError: "Error",
     errorLoadMessages: "No s'han pogut carregar els missatges.",
     errorSendMessage: "No s'ha pogut enviar el missatge.",
-   errorAnalyzeAI: "No s'ha pogut analitzar amb IA.",
+    errorAnalyzeAI: "No s'ha pogut analitzar amb IA.",
+    errorLoadUser: "No s'ha pogut carregar l'usuari",
     errorUseStateMachine: "useStateMachine s'ha d'utilitzar dins de StateMachineProvider",
 
     // ChatArea
