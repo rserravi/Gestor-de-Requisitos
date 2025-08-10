@@ -16,6 +16,7 @@ import { fetchProjectMessages, sendMessage, type ChatMessageCreatePayload } from
 import type { MessageModel } from "./models/message-model";
 import { CircularProgress, Typography, Backdrop } from "@mui/material";
 import { addStateMachineEntry } from "./services/state-machine-service";
+import type { Language } from "./i18n";
 
 interface AppProps {
   isDarkMode: boolean;
@@ -24,7 +25,7 @@ interface AppProps {
 
 export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [language, setLanguage] = useState("es");
+  const [language, setLanguage] = useState<Language>("es");
   const [user, setUser] = useState<UserModel | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
@@ -221,7 +222,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
           setIsMenuOpen(false);
           navigate("/login", { replace: true });
         }}
-        language={language as "en" | "es" | "ca"}
+        language={language}
         onSettings={() => {
           setIsMenuOpen(false);
           navigate("/settings");
@@ -290,7 +291,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                       showFiles={showFiles}
                       collapsed={isChatCollapsed}
                       onToggleCollapse={() => setIsChatCollapsed((c) => !c)}
-                      language={language as "en" | "es" | "ca"}
+                      language={language}
                       projectId={activeProject?.id || 0}
                     />
                   </Box>
@@ -301,7 +302,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                       <RequirementsTable
                         collapsed={isReqsCollapsed}
                         onToggleCollapse={() => setIsReqsCollapsed((c) => !c)}
-                        language={language as "en" | "es" | "ca"}
+                        language={language}
                         ownerId={user.id}
                         projectId={activeProject.id}
                       />
@@ -322,7 +323,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                 <SettingsPage
                   user={user}
                   onUpdate={() => { }}
-                  language={language as "en" | "es" | "ca"}
+                  language={language}
                   onLanguageChange={setLanguage}
                 />
               ) : (

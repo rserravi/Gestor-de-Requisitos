@@ -2,6 +2,7 @@
 import { api } from "./api";
 import type { MessageModel } from "../models/message-model";
 import type { StateMachineState } from "../context/StateMachineContext";
+import type { Language } from "../i18n";
 
 // === Nuevo payload de creación ===
 export interface ChatMessageCreatePayload {
@@ -9,7 +10,7 @@ export interface ChatMessageCreatePayload {
   sender: "user" | "ai";
   project_id: number;
   state: StateMachineState;
-  language?: string;           // el service lo rellenará si no viene
+  language?: Language;           // el service lo rellenará si no viene
   example_samples?: string[];  // opcional
 }
 
@@ -44,11 +45,11 @@ export async function fetchProjectMessages(
 export async function sendMessage(
   payload: ChatMessageCreatePayload
 ): Promise<MessageModel> {
-  const language =
+  const language: Language =
     payload.language ??
     (typeof navigator !== "undefined" && navigator.language
-      ? navigator.language
-      : "es-ES");
+      ? (navigator.language.split("-")[0] as Language)
+      : "es");
 
   const body = { ...payload, language };
 
