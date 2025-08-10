@@ -39,10 +39,10 @@ Este repositorio contiene la interfaz web del **Gestor de Requisitos**, una apli
    cp .env.example .env
    ```
 
-   - Establece la URL del backend, por ejemplo:
+   - Establece la URL base del backend, por ejemplo:
 
      ```env
-     VITE_API_URL=http://localhost:8000
+     VITE_API_BASE_URL=http://localhost:8000
      ```
 
 4. Inicia la aplicación en modo desarrollo:
