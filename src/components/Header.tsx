@@ -84,7 +84,7 @@ export function Header({
             checked={isDarkMode}
             onChange={onToggleDarkMode}
             color="primary"
-            inputProps={{ "aria-label": "toggle dark/light mode" }}
+            inputProps={{ "aria-label": t.toggleDarkMode }}
           />
           <Brightness4 sx={{ ml: 1 }} />
         </Box>

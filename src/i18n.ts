@@ -1,6 +1,7 @@
 export type Language = "en" | "es" | "ca";
 
 type Translations = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- allow nested translation objects
   [key: string]: any; // Usamos 'any' para anidar objetos de traducción
 };
 
@@ -107,6 +108,7 @@ const translations: Record<Language, Translations> = {
     headerTitle: "Requirements Manager - {activeProject}",
     toggleMenu: "Toggle menu",
     selectLanguage: "Select language",
+    toggleDarkMode: "Toggle dark/light mode",
     // Languages
     languages: {
       en: "English",
@@ -269,6 +271,7 @@ const translations: Record<Language, Translations> = {
     headerTitle: "Gestor de Requisitos - {activeProject}",
     toggleMenu: "Abrir/cerrar menú",
     selectLanguage: "Seleccionar idioma",
+    toggleDarkMode: "Alternar modo claro/oscuro",
     // Languages
     languages: {
       en: "Inglés",
@@ -431,6 +434,7 @@ const translations: Record<Language, Translations> = {
     headerTitle: "Gestor de Requisits - {activeProject}",
     toggleMenu: "Obrir/tancar menú",
     selectLanguage: "Seleccionar idioma",
+    toggleDarkMode: "Alternar mode clar/fosc",
     // Languages
     languages: {
       en: "Anglès",
