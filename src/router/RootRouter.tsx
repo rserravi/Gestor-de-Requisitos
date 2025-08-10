@@ -22,9 +22,11 @@ export function RootRouter(props: RootRouterProps) {
 
     window.addEventListener("storage", handleAuthChanged);
     window.addEventListener("auth:changed", handleAuthChanged);
+    window.addEventListener("auth:expired", handleAuthChanged);
     return () => {
       window.removeEventListener("storage", handleAuthChanged);
       window.removeEventListener("auth:changed", handleAuthChanged);
+      window.removeEventListener("auth:expired", handleAuthChanged);
     };
   }, []);
 

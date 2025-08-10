@@ -17,8 +17,11 @@ api.interceptors.response.use(
     // Si el backend devuelve 401/403 => sesión expirada o inválida
     if (error?.response?.status === 401 || error?.response?.status === 403) {
       // Limpia token y avisa a la App
-      try { localStorage.removeItem("access_token"); } catch {}
+      try {
+        localStorage.removeItem("access_token");
+      } catch {}
       window.dispatchEvent(new CustomEvent("auth:expired"));
+      window.dispatchEvent(new CustomEvent("auth:changed"));
     }
     return Promise.reject(error);
   }
