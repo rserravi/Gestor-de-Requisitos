@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import {
-  Paper, Box, Stack, Typography, IconButton, Button, Collapse, TextField, Alert
+  Paper, Box, Stack, Typography, IconButton, Button, Collapse, TextField, Alert, MenuItem, Menu
 } from "@mui/material";
 import {
   Send as SendIcon,
@@ -9,17 +9,19 @@ import {
   ExpandLess,
   ExpandMore
 } from "@mui/icons-material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ReactMarkdown from "react-markdown";
 import { getTranslations, type Language } from "../i18n";
 import type { MessageModel } from "../models/message-model";
 import { useStateMachine } from "../context/StateMachineContext";
+import type { ChatMessageCreatePayload } from "../services/chat-service";
 
 interface ChatAreaProps {
   chatMessages: MessageModel[];
-  loading: boolean; // Solo para deshabilitar inputs; el Backdrop lo maneja App
+  loading: boolean; // lo usa App para Backdrop; aquí solo deshabilitamos inputs
   error: string | null;
-  onSendMessage: (msg: Omit<MessageModel, "id" | "timestamp">, projectId: number) => Promise<void>;
-  onGenerateRequirements: () => void; // App hará el POST a /state_machine y gestionará loading/backdrop
+  onSendMessage: (msg: ChatMessageCreatePayload, projectId: number) => Promise<void>;
+  onGenerateRequirements: () => void;
   showFiles: boolean;
   collapsed: boolean;
   onToggleCollapse: () => void;
@@ -43,7 +45,7 @@ export function ChatArea({
   const [inputValue, setInputValue] = useState("");
   const { state: smState } = useStateMachine();
 
-  // scroll sólo del área de mensajes
+  // scroll solo del área de mensajes
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = messagesContainerRef.current;
@@ -58,24 +60,54 @@ export function ChatArea({
   const [selectedConfigFile, setSelectedConfigFile] = useState<number | "">("");
   const [exampleRequirementsText, setExampleRequirementsText] = useState<string>("");
 
+  // === Helpers ===
+  const shouldAttachExamples =
+    smState === "new_requisites" || smState === "analyze_requisites";
+
+  const parseExamples = (raw: string): string[] => {
+    return raw
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .map((l) => l.replace(/^[-*]\s+/, ""))          // bullets
+      .map((l) => l.replace(/^\d+[.)]\s+/, ""))       // n.) o n)
+      .filter((l) => l.length > 0);
+  };
+
+  // === Envío de mensaje ===
   const handleSend = async () => {
     if (!inputValue.trim()) return;
-    const msgToSend = {
+
+    const payload: ChatMessageCreatePayload = {
       content: inputValue,
-      sender: "user" as const,
+      sender: "user",
       project_id: projectId,
-      state: smState
+      state: smState,
+      // language lo añade el service si no se pasa
     };
-    await onSendMessage(msgToSend, projectId);
+
+    if (shouldAttachExamples) {
+      const examples = parseExamples(exampleRequirementsText);
+      if (examples.length > 0) {
+        payload.example_samples = examples;
+      }
+    }
+
+    await onSendMessage(payload, projectId);
     setInputValue("");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   };
+
+  // === Botón con menú para No Funcionales (mismo look & feel que el otro botón) ===
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const menuOpen = Boolean(anchorEl);
+  const handleOpenMenu = (e: React.MouseEvent<HTMLElement>) => setAnchorEl(e.currentTarget);
+  const handleCloseMenu = () => setAnchorEl(null);
 
   return (
     <Paper elevation={3} sx={{
@@ -119,45 +151,44 @@ export function ChatArea({
               overflow="auto"
               mb={1}
             >
-              {error && (
-                <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>
-              )}
+              {error && <Alert severity="error" sx={{ mb: 1 }}>{error}</Alert>}
+
               <Stack spacing={2}>
                 {chatMessages.map((message) => (
                   <Box
                     key={message.id}
                     display="flex"
-                    justifyContent={message.sender === 'user' ? "flex-end" : "flex-start"}
+                    justifyContent={message.sender === "user" ? "flex-end" : "flex-start"}
                   >
                     <Paper
                       sx={{
                         maxWidth: "80%",
                         px: 2,
                         py: 1.5,
-                        bgcolor: message.sender === 'user'
+                        bgcolor: message.sender === "user"
                           ? "primary.main"
                           : "background.default",
-                        color: message.sender === 'user'
+                        color: message.sender === "user"
                           ? "primary.contrastText"
                           : "text.primary",
                         borderRadius: 2
                       }}
-                      elevation={message.sender === 'user' ? 3 : 1}
+                      elevation={message.sender === "user" ? 3 : 1}
                     >
                       <ReactMarkdown
                         children={message.content}
                         components={{
-                          p: props => <Typography variant="body2" sx={{ mb: 0.5 }}>{props.children}</Typography>,
-                          ul: props => <ul style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ul>,
-                          ol: props => <ol style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ol>,
-                          li: props => <li><Typography variant="body2" component="span">{props.children}</Typography></li>,
-                          code: props => <code style={{ background: "#eee", borderRadius: 4, padding: "0 4px" }}>{props.children}</code>
+                          p: (props) => <Typography variant="body2" sx={{ mb: 0.5 }}>{props.children}</Typography>,
+                          ul: (props) => <ul style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ul>,
+                          ol: (props) => <ol style={{ paddingLeft: "1.2em", margin: 0 }}>{props.children}</ol>,
+                          li: (props) => <li><Typography variant="body2" component="span">{props.children}</Typography></li>,
+                          code: (props) => <code style={{ background: "#eee", borderRadius: 4, padding: "0 4px" }}>{props.children}</code>
                         }}
                       />
                       <Typography variant="caption" sx={{ opacity: 0.6, display: "block", mt: 1 }}>
                         {message.timestamp instanceof Date
-                          ? message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                          : new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          ? message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                          : new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </Typography>
                     </Paper>
                   </Box>
@@ -182,42 +213,86 @@ export function ChatArea({
                 </Button>
               </Box>
             ) : (
-              <Box display="flex" alignItems="end" gap={2} pt={2} pb={1}>
-                <TextField
-                  multiline
-                  minRows={2}
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={t.textareaPlaceholder}
-                  fullWidth
-                  variant="outlined"
-                  size="small"
-                  sx={{ bgcolor: "background.paper" }}
-                  disabled={loading}
-                />
-                <Stack spacing={1}>
-                  <Button
+              <>
+                {/* fila input + acciones */}
+                <Box display="flex" alignItems="end" gap={2} pt={2} pb={1}>
+                  <TextField
+                    multiline
+                    minRows={2}
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder={t.textareaPlaceholder}
+                    fullWidth
                     variant="outlined"
-                    color="primary"
-                    onClick={onGenerateRequirements}
-                    title={t.analyzeWithAI}
                     size="small"
+                    sx={{ bgcolor: "background.paper" }}
                     disabled={loading}
-                  >
-                    <SparklesIcon fontSize="small" />
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleSend}
-                    size="small"
-                    disabled={loading || !inputValue.trim()}
-                  >
-                    <SendIcon fontSize="small" />
-                  </Button>
-                </Stack>
-              </Box>
+                  />
+                  <Stack spacing={1}>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={onGenerateRequirements}
+                      title={t.analyzeWithAI}
+                      size="small"
+                      disabled={loading}
+                    >
+                      <SparklesIcon fontSize="small" />
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSend}
+                      size="small"
+                      disabled={loading || !inputValue.trim()}
+                    >
+                      <SendIcon fontSize="small" />
+                    </Button>
+                  </Stack>
+                </Box>
+
+                {/* Acciones extra SOLO en modo STALL */}
+                {smState === "stall" && (
+                  <Box pb={1}>
+                    <Stack direction={{ xs: "column", sm: "row" }} spacing={1} alignItems="center">
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        disabled={loading}
+                        onClick={() => console.log("Añadir R. Funcionales")}
+                        sx={{ whiteSpace: "nowrap" }}
+                      >
+                        Añadir R. Funcionales
+                      </Button>
+
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="small"
+                        endIcon={<ArrowDropDownIcon />}
+                        onClick={handleOpenMenu}
+                        disabled={loading}
+                        sx={{ whiteSpace: "nowrap" }}
+                      >
+                        Añadir R. No Funcionales
+                      </Button>
+                      <Menu
+                        anchorEl={anchorEl}
+                        open={menuOpen}
+                        onClose={handleCloseMenu}
+                        MenuListProps={{ dense: true }}
+                      >
+                        <MenuItem onClick={() => { console.log("performance"); handleCloseMenu(); }}>Performance</MenuItem>
+                        <MenuItem onClick={() => { console.log("usability"); handleCloseMenu(); }}>Usability</MenuItem>
+                        <MenuItem onClick={() => { console.log("security"); handleCloseMenu(); }}>Security</MenuItem>
+                        <MenuItem onClick={() => { console.log("technical"); handleCloseMenu(); }}>Technical</MenuItem>
+                      </Menu>
+                    </Stack>
+                  </Box>
+                )}
+              </>
             )}
           </Box>
 

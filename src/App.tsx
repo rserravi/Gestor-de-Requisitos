@@ -12,7 +12,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { useStateMachine } from "./context/StateMachineContext";
 import { getMe, logout } from "./services/auth-service";
 import { listProjects, createProject } from "./services/project-service";
-import { fetchProjectMessages, sendMessage } from "./services/chat-service";
+import { fetchProjectMessages, sendMessage, type ChatMessageCreatePayload } from "./services/chat-service";
 import type { MessageModel } from "./models/message-model";
 import { CircularProgress, Typography, Backdrop } from "@mui/material";
 import { addStateMachineEntry } from "./services/state-machine-service";
@@ -141,14 +141,14 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
 
   // Enviar mensaje y recargar/sincronizar
   const handleSendMessage = async (
-    msg: Omit<MessageModel, "id" | "timestamp">,
+    msg: ChatMessageCreatePayload,
     projectId: number
   ) => {
     setLoadingChat(true);
     setErrorChat(null);
     try {
       await sendMessage(msg);
-      await reloadMessages(); // Esto también sincroniza el estado global
+      await reloadMessages();
     } catch (e: any) {
       setErrorChat("No se pudo enviar el mensaje.");
     } finally {
@@ -156,30 +156,31 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
     }
   };
 
+
   // Handler para Analizar con IA
-const handleAnalyzeWithAI = async () => {
-  if (!activeProject?.id) return;
-  setLoadingChat(true);
-  setErrorChat(null);
-  try {
-    // Deriva a código corto (es, en, ca, ...)
-    const langShort = (language || "es").split("-")[0];
+  const handleAnalyzeWithAI = async () => {
+    if (!activeProject?.id) return;
+    setLoadingChat(true);
+    setErrorChat(null);
+    try {
+      // Deriva a código corto (es, en, ca, ...)
+      const langShort = (language || "es").split("-")[0];
 
-    await addStateMachineEntry(activeProject.id, "analyze_requisites", {
-      language: langShort,
-    });
+      await addStateMachineEntry(activeProject.id, "analyze_requisites", {
+        language: langShort,
+      });
 
-    // Opcional: reflejar de inmediato
-    setSmState("analyze_requisites");
+      // Opcional: reflejar de inmediato
+      setSmState("analyze_requisites");
 
-    // Recarga mensajes (sincroniza state también)
-    await reloadMessages();
-  } catch (e) {
-    setErrorChat("No se pudo analizar con IA.");
-  } finally {
-    setLoadingChat(false);
-  }
-};
+      // Recarga mensajes (sincroniza state también)
+      await reloadMessages();
+    } catch (e) {
+      setErrorChat("No se pudo analizar con IA.");
+    } finally {
+      setLoadingChat(false);
+    }
+  };
 
   // Handler para crear nuevo proyecto desde SideMenu
   const handleProjectCreated = async (name: string, description: string) => {

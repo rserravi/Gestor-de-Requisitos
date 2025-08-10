@@ -3,6 +3,16 @@ import { api } from "./api";
 import type { MessageModel } from "../models/message-model";
 import type { StateMachineState } from "../context/StateMachineContext";
 
+// === Nuevo payload de creación ===
+export interface ChatMessageCreatePayload {
+  content: string;
+  sender: "user" | "ai";
+  project_id: number;
+  state: StateMachineState;
+  language?: string;           // el service lo rellenará si no viene
+  example_samples?: string[];  // opcional
+}
+
 // Adaptador entre backend (ISO string) y frontend (Date)
 function mapBackendToMessage(data: any): MessageModel {
   return {
@@ -30,17 +40,19 @@ export async function fetchProjectMessages(
   return messages;
 }
 
-// Enviar mensaje (añadimos language automáticamente)
+// Enviar mensaje (añade language automáticamente si no viene)
 export async function sendMessage(
-  msg: Omit<MessageModel, "id" | "timestamp">
+  payload: ChatMessageCreatePayload
 ): Promise<MessageModel> {
-  const language = typeof navigator !== "undefined" && navigator.language
-    ? navigator.language
-    : "es-ES";
+  const language =
+    payload.language ??
+    (typeof navigator !== "undefined" && navigator.language
+      ? navigator.language
+      : "es-ES");
 
-  const payload = { ...msg, language };
+  const body = { ...payload, language };
 
-  const { data } = await api.post("/chat_messages/", payload, {
+  const { data } = await api.post("/chat_messages/", body, {
     headers: { "Content-Type": "application/json" },
   });
   return mapBackendToMessage(data);

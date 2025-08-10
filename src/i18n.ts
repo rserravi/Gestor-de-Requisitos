@@ -22,6 +22,8 @@ const translations: Record<Language, Translations> = {
     exampleRequirementsTitle: "Requirement Examples",
     exampleRequirementsPlaceholder: "Paste your requirement examples here...",
     exampleRequirementsNote: "The content will be sent automatically to the AI when generating requirements. You don't need to save.",
+    chatStallAddFunctional: "Add Functional Req.",
+    chatStallAddNonFunctional: "Add Non-Functional Req.",
 
     // RequirementsTable
     requirementsTableTitle: "Requirements Table",
@@ -154,6 +156,8 @@ const translations: Record<Language, Translations> = {
     exampleRequirementsTitle: "Ejemplos de requisitos",
     exampleRequirementsPlaceholder: "Pega aquí tus ejemplos de requisitos...",
     exampleRequirementsNote: "El contenido se enviará automáticamente a la IA al generar requisitos. No necesitas guardar.",
+    chatStallAddFunctional: "Añadir R. Funcional",
+    chatStallAddNonFunctional: "Añadir R. No Funcional",
 
     // RequirementsTable
     requirementsTableTitle: "Tabla de Requisitos",
@@ -286,6 +290,8 @@ const translations: Record<Language, Translations> = {
     exampleRequirementsTitle: "Exemples de requisits",
     exampleRequirementsPlaceholder: "Enganxa aquí els teus exemples de requisits...",
     exampleRequirementsNote: "El contingut s'enviarà automàticament a la IA en generar requisits. No cal que desis.",
+    chatStallAddFunctional: "Afegir R. Funcional",
+    chatStallAddNonFunctional: "Afegir R. No Funcional",
 
     // RequirementsTable
     requirementsTableTitle: "Taula de Requisits",
