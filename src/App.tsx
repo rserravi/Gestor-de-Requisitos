@@ -101,6 +101,28 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
     // eslint-disable-next-line
   }, []);
 
+  // Ajusta idioma y tema según preferencias del usuario al iniciar sesión
+  useEffect(() => {
+    if (user?.preferences) {
+      // Ajustar idioma
+      setLanguage(user.preferences.language);
+
+      // Determinar modo oscuro deseado
+      let shouldBeDark = isDarkMode;
+      const prefTheme = user.preferences.theme;
+      if (prefTheme === "dark") shouldBeDark = true;
+      else if (prefTheme === "light") shouldBeDark = false;
+      else if (prefTheme === "auto") {
+        shouldBeDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      }
+
+      // Cambiar tema si es necesario
+      if (shouldBeDark !== isDarkMode) {
+        onToggleDarkMode();
+      }
+    }
+  }, [user, isDarkMode, onToggleDarkMode]);
+
   // Recupera proyectos cuando hay usuario
   useEffect(() => {
     if (user) {
