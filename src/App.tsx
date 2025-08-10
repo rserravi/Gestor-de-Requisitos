@@ -76,10 +76,16 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
       try {
         const userData = await getMe();
         setUser(userData);
-      } catch {
-        logout(); // asegúrate de limpiar token
-        setUser(null);
-        navigate("/login", { replace: true });
+      } catch (err: any) {
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) {
+          logout(); // asegúrate de limpiar token
+          setUser(null);
+          navigate("/login", { replace: true });
+        } else {
+          console.error(err);
+          alert("Error loading user");
+        }
       } finally {
         setLoadingUser(false);
       }
