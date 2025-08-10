@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { getTranslations, type Language } from "../i18n";
 
 // Define los estados posibles
 export type StateMachineState = "init" | "software_questions" | "new_requisites" | "analyze_requisites" | "stall";
@@ -51,6 +52,13 @@ export function StateMachineProvider({ children }: { children: React.ReactNode }
 // Hook para acceder al contexto
 export function useStateMachine() {
   const ctx = useContext(StateMachineContext);
-  if (!ctx) throw new Error("useStateMachine debe usarse dentro de StateMachineProvider");
+  if (!ctx) {
+    const language: Language =
+      typeof navigator !== "undefined" && navigator.language
+        ? (navigator.language.split("-")[0] as Language)
+        : "es";
+    const t = getTranslations(language);
+    throw new Error(t.errorUseStateMachine);
+  }
   return ctx;
 }

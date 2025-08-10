@@ -10,10 +10,11 @@ const translations: Record<Language, Translations> = {
     // App
     processingResponse: "Your response is being processed by the AI.",
     processingWait: "It may take up to a minute. Please wait...",
+    genericError: "Error",
     errorLoadMessages: "Failed to load messages.",
     errorSendMessage: "Failed to send the message.",
     errorAnalyzeAI: "Failed to analyze with AI.",
-    errorLoadUser: "Error loading user",
+    errorUseStateMachine: "useStateMachine must be used within StateMachineProvider",
 
     // ChatArea
     chatTitle: "AI Assistant",
@@ -109,6 +110,7 @@ const translations: Record<Language, Translations> = {
     headerTitle: "Requirements Manager - {activeProject}",
     toggleMenu: "Toggle menu",
     selectLanguage: "Select language",
+    toggleDarkMode: "Toggle dark/light mode",
     // Languages
     languages: {
       en: "English",
@@ -168,15 +170,20 @@ const translations: Record<Language, Translations> = {
     registerLink: "Register",
     hasAccountPrompt: "Already have an account?",
     loginLink: "Login",
+    registerSuccess: "Registration successful",
+    errorRegisterUser: "Error registering user",
+    tokenNotReceived: "Token not received",
+    errorLogin: "Error logging in",
   },
   es: {
     // App
     processingResponse: "Su respuesta está siendo procesada por la IA.",
     processingWait: "Podría tardar hasta un minuto. Por favor, espere...",
+    genericError: "Error",
     errorLoadMessages: "No se pudieron cargar los mensajes.",
     errorSendMessage: "No se pudo enviar el mensaje.",
     errorAnalyzeAI: "No se pudo analizar con IA.",
-    errorLoadUser: "No se pudo cargar el usuario",
+    errorUseStateMachine: "useStateMachine debe usarse dentro de StateMachineProvider",
 
     // ChatArea
     chatTitle: "Asistente IA",
@@ -272,6 +279,7 @@ const translations: Record<Language, Translations> = {
     headerTitle: "Gestor de Requisitos - {activeProject}",
     toggleMenu: "Abrir/cerrar menú",
     selectLanguage: "Seleccionar idioma",
+    toggleDarkMode: "Alternar modo claro/oscuro",
     // Languages
     languages: {
       en: "Inglés",
@@ -331,15 +339,21 @@ const translations: Record<Language, Translations> = {
     registerLink: "Regístrate",
     hasAccountPrompt: "¿Ya tienes cuenta?",
     loginLink: "Inicia sesión",
+    registerSuccess: "Registro exitoso",
+    errorRegisterUser: "Error al registrar usuario",
+    tokenNotReceived: "Token no recibido",
+    errorLogin: "Error al iniciar sesión",
   },
   ca: {
     // App
     processingResponse: "La teva resposta està sent processada per la IA.",
     processingWait: "Podria trigar fins a un minut. Si us plau, espera...",
+    genericError: "Error",
     errorLoadMessages: "No s'han pogut carregar els missatges.",
     errorSendMessage: "No s'ha pogut enviar el missatge.",
     errorAnalyzeAI: "No s'ha pogut analitzar amb IA.",
     errorLoadUser: "No s'ha pogut carregar l'usuari",
+    errorUseStateMachine: "useStateMachine s'ha d'utilitzar dins de StateMachineProvider",
 
     // ChatArea
     chatTitle: "Assistent IA",
@@ -435,6 +449,7 @@ const translations: Record<Language, Translations> = {
     headerTitle: "Gestor de Requisits - {activeProject}",
     toggleMenu: "Obrir/tancar menú",
     selectLanguage: "Seleccionar idioma",
+    toggleDarkMode: "Alternar mode clar/fosc",
     // Languages
     languages: {
       en: "Anglès",
@@ -494,6 +509,10 @@ const translations: Record<Language, Translations> = {
     registerLink: "Registra't",
     hasAccountPrompt: "Ja tens compte?",
     loginLink: "Inicia sessió",
+    registerSuccess: "Registre amb èxit",
+    errorRegisterUser: "Error en registrar l'usuari",
+    tokenNotReceived: "Token no rebut",
+    errorLogin: "Error en iniciar sessió",
   },
 };
 
