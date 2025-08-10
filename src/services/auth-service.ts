@@ -50,6 +50,7 @@ export async function login({
     });
 
     localStorage.setItem("access_token", data.access_token);
+    window.dispatchEvent(new CustomEvent("auth:changed"));
     return data;
   } catch (error) {
     const err = error as AxiosError<{ detail?: string }>;
@@ -68,6 +69,7 @@ export async function getMe() {
 export function logout() {
   try {
     localStorage.removeItem("access_token");
+    window.dispatchEvent(new CustomEvent("auth:changed"));
   } catch {
     // ignorar si no existe
   }
