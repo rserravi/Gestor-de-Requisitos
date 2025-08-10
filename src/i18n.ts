@@ -12,6 +12,7 @@ const translations: Record<Language, Translations> = {
     errorLoadMessages: "Failed to load messages.",
     errorSendMessage: "Failed to send the message.",
     errorAnalyzeAI: "Failed to analyze with AI.",
+    errorUseStateMachine: "useStateMachine must be used within StateMachineProvider",
 
     // ChatArea
     chatTitle: "AI Assistant",
@@ -174,6 +175,7 @@ const translations: Record<Language, Translations> = {
     errorLoadMessages: "No se pudieron cargar los mensajes.",
     errorSendMessage: "No se pudo enviar el mensaje.",
     errorAnalyzeAI: "No se pudo analizar con IA.",
+    errorUseStateMachine: "useStateMachine debe usarse dentro de StateMachineProvider",
 
     // ChatArea
     chatTitle: "Asistente IA",
@@ -335,7 +337,8 @@ const translations: Record<Language, Translations> = {
     processingWait: "Podria trigar fins a un minut. Si us plau, espera...",
     errorLoadMessages: "No s'han pogut carregar els missatges.",
     errorSendMessage: "No s'ha pogut enviar el missatge.",
-    errorAnalyzeAI: "No s'ha pogut analitzar amb IA.",
+   errorAnalyzeAI: "No s'ha pogut analitzar amb IA.",
+    errorUseStateMachine: "useStateMachine s'ha d'utilitzar dins de StateMachineProvider",
 
     // ChatArea
     chatTitle: "Assistent IA",
