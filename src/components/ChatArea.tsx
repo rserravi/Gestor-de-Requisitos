@@ -15,6 +15,8 @@ import { getTranslations, type Language } from "../i18n";
 import type { MessageModel } from "../models/message-model";
 import { useStateMachine } from "../context/StateMachineContext";
 import type { ChatMessageCreatePayload } from "../services/chat-service";
+import { fetchConfigFiles, fetchFileRequirements } from "../services/config-files-service";
+import type { ConfigFile } from "../services/config-files-service";
 
 interface ChatAreaProps {
   chatMessages: MessageModel[];
@@ -57,13 +59,37 @@ export function ChatArea({
     if (el) el.scrollTop = el.scrollHeight;
   }, [chatMessages]);
 
-  // Mock combo archivos configuración
-  const uploadedConfigFilesMock = [
-    { id: 1, name: "requisitos_api.docx" },
-    { id: 2, name: "ejemplo_requisitos.md" }
-  ];
+  const [uploadedConfigFiles, setUploadedConfigFiles] = useState<ConfigFile[]>([]);
   const [selectedConfigFile, setSelectedConfigFile] = useState<number | "">("");
   const [exampleRequirementsText, setExampleRequirementsText] = useState<string>("");
+
+  useEffect(() => {
+    async function loadConfigFiles() {
+      try {
+        const files = await fetchConfigFiles(projectId);
+        setUploadedConfigFiles(files);
+      } catch {
+        /* empty */
+      }
+    }
+    loadConfigFiles();
+  }, [projectId]);
+
+  useEffect(() => {
+    if (!selectedConfigFile) {
+      setExampleRequirementsText("");
+      return;
+    }
+    async function loadFileRequirements() {
+      try {
+        const text = await fetchFileRequirements(selectedConfigFile as number);
+        setExampleRequirementsText(text);
+      } catch {
+        /* empty */
+      }
+    }
+    loadFileRequirements();
+  }, [selectedConfigFile]);
 
   // === Helpers ===
   const shouldAttachExamples =
@@ -333,9 +359,9 @@ export function ChatArea({
                   sx={{ mb: 2 }}
                 >
                   <option value="">{t.selectFilePlaceholder}</option>
-                  {uploadedConfigFilesMock.map(f =>
+                  {uploadedConfigFiles.map(f => (
                     <option key={f.id} value={f.id}>{f.name}</option>
-                  )}
+                  ))}
                 </TextField>
               </Box>
 
