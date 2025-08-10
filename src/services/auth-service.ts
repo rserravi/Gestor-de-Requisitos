@@ -1,6 +1,7 @@
 // services/auth-service.ts
 import { api } from "./api";
 import type { AxiosError } from "axios";
+import { getTranslations, type Language } from "../i18n";
 
 // Registra un usuario nuevo
 export async function register({
@@ -14,6 +15,11 @@ export async function register({
   password: string;
   avatar?: string | null;
 }) {
+  const language: Language =
+    typeof navigator !== "undefined" && navigator.language
+      ? (navigator.language.split("-")[0] as Language)
+      : "es";
+  const t = getTranslations(language);
   try {
     await api.post("/auth/register", {
       username,
@@ -23,10 +29,10 @@ export async function register({
     });
 
     const loginData = await login({ username, password });
-    return { message: "Registro exitoso", ...loginData };
+    return { message: t.registerSuccess, ...loginData };
   } catch (error) {
     const err = error as AxiosError<{ detail?: string }>;
-    const message = err.response?.data?.detail ?? err.message ?? "Error al registrar usuario";
+    const message = err.response?.data?.detail ?? err.message ?? t.errorRegisterUser;
     throw new Error(message);
   }
 }
@@ -39,6 +45,11 @@ export async function login({
   username: string;
   password: string;
 }) {
+  const language: Language =
+    typeof navigator !== "undefined" && navigator.language
+      ? (navigator.language.split("-")[0] as Language)
+      : "es";
+  const t = getTranslations(language);
   try {
     const params = new URLSearchParams();
     params.append("username", username);
@@ -51,7 +62,7 @@ export async function login({
 
     const token = typeof data?.access_token === "string" ? data.access_token.trim() : "";
     if (!token) {
-      throw new Error("Token no recibido");
+      throw new Error(t.tokenNotReceived);
     }
 
     localStorage.setItem("access_token", token);
@@ -59,7 +70,7 @@ export async function login({
     return { ...data, access_token: token };
   } catch (error) {
     const err = error as AxiosError<{ detail?: string }>;
-    const message = err.response?.data?.detail ?? err.message ?? "Error al iniciar sesión";
+    const message = err.response?.data?.detail ?? err.message ?? t.errorLogin;
     throw new Error(message);
   }
 }

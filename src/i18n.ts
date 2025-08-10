@@ -166,6 +166,10 @@ const translations: Record<Language, Translations> = {
     registerLink: "Register",
     hasAccountPrompt: "Already have an account?",
     loginLink: "Login",
+    registerSuccess: "Registration successful",
+    errorRegisterUser: "Error registering user",
+    tokenNotReceived: "Token not received",
+    errorLogin: "Error logging in",
   },
   es: {
     // App
@@ -328,6 +332,10 @@ const translations: Record<Language, Translations> = {
     registerLink: "Regístrate",
     hasAccountPrompt: "¿Ya tienes cuenta?",
     loginLink: "Inicia sesión",
+    registerSuccess: "Registro exitoso",
+    errorRegisterUser: "Error al registrar usuario",
+    tokenNotReceived: "Token no recibido",
+    errorLogin: "Error al iniciar sesión",
   },
   ca: {
     // App
@@ -490,6 +498,10 @@ const translations: Record<Language, Translations> = {
     registerLink: "Registra't",
     hasAccountPrompt: "Ja tens compte?",
     loginLink: "Inicia sessió",
+    registerSuccess: "Registre amb èxit",
+    errorRegisterUser: "Error en registrar l'usuari",
+    tokenNotReceived: "Token no rebut",
+    errorLogin: "Error en iniciar sessió",
   },
 };
 
