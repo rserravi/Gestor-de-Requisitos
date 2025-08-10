@@ -302,10 +302,10 @@ export function ChatArea({
                         onClose={handleCloseMenu}
                         MenuListProps={{ dense: true }}
                       >
-                        <MenuItem onClick={async () => { await handleGenerateRequirement("performance"); handleCloseMenu(); }}>{t.category.performance}</MenuItem>
-                        <MenuItem onClick={async () => { await handleGenerateRequirement("usability"); handleCloseMenu(); }}>{t.category.usability}</MenuItem>
-                        <MenuItem onClick={async () => { await handleGenerateRequirement("security"); handleCloseMenu(); }}>{t.category.security}</MenuItem>
-                        <MenuItem onClick={async () => { await handleGenerateRequirement("technical"); handleCloseMenu(); }}>{t.category.technical}</MenuItem>
+                        <MenuItem onClick={async () => { handleCloseMenu(); await handleGenerateRequirement("performance"); }}>{t.category.performance}</MenuItem>
+                        <MenuItem onClick={async () => { handleCloseMenu(); await handleGenerateRequirement("usability"); }}>{t.category.usability}</MenuItem>
+                        <MenuItem onClick={async () => { handleCloseMenu(); await handleGenerateRequirement("security"); }}>{t.category.security}</MenuItem>
+                        <MenuItem onClick={async () => { handleCloseMenu(); await handleGenerateRequirement("technical"); }}>{t.category.technical}</MenuItem>
                       </Menu>
                     </Stack>
                   </Box>
