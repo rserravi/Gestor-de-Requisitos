@@ -15,6 +15,7 @@ import { getTranslations, type Language } from "../i18n";
 import type { MessageModel } from "../models/message-model";
 import { useStateMachine } from "../context/StateMachineContext";
 import type { ChatMessageCreatePayload } from "../services/chat-service";
+import { generateRequirement } from "../services/requirements-service";
 
 interface ChatAreaProps {
   chatMessages: MessageModel[];
@@ -111,6 +112,21 @@ export function ChatArea({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handleGenerateRequirement = async (category: string) => {
+    const examples = parseExamples(exampleRequirementsText);
+
+    try {
+      await generateRequirement(
+        projectId,
+        category,
+        language,
+        examples.length > 0 ? examples : undefined
+      );
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -277,7 +293,7 @@ export function ChatArea({
                         color="primary"
                         size="small"
                         disabled={loading}
-                        onClick={() => console.log(t.chatStallAddFunctional)}
+                        onClick={() => handleGenerateRequirement("functional")}
                         sx={{ whiteSpace: "nowrap" }}
                       >
                         {t.chatStallAddFunctional}
@@ -300,10 +316,10 @@ export function ChatArea({
                         onClose={handleCloseMenu}
                         MenuListProps={{ dense: true }}
                       >
-                        <MenuItem onClick={() => { console.log("performance"); handleCloseMenu(); }}>{t.category.performance}</MenuItem>
-                        <MenuItem onClick={() => { console.log("usability"); handleCloseMenu(); }}>{t.category.usability}</MenuItem>
-                        <MenuItem onClick={() => { console.log("security"); handleCloseMenu(); }}>{t.category.security}</MenuItem>
-                        <MenuItem onClick={() => { console.log("technical"); handleCloseMenu(); }}>{t.category.technical}</MenuItem>
+                        <MenuItem onClick={async () => { await handleGenerateRequirement("performance"); handleCloseMenu(); }}>{t.category.performance}</MenuItem>
+                        <MenuItem onClick={async () => { await handleGenerateRequirement("usability"); handleCloseMenu(); }}>{t.category.usability}</MenuItem>
+                        <MenuItem onClick={async () => { await handleGenerateRequirement("security"); handleCloseMenu(); }}>{t.category.security}</MenuItem>
+                        <MenuItem onClick={async () => { await handleGenerateRequirement("technical"); handleCloseMenu(); }}>{t.category.technical}</MenuItem>
                       </Menu>
                     </Stack>
                   </Box>
