@@ -16,13 +16,15 @@ export function RootRouter(props: RootRouterProps) {
   );
 
   useEffect(() => {
-    const handleStorage = () => {
+    const handleAuthChanged = () => {
       setToken(localStorage.getItem("access_token"));
     };
 
-    window.addEventListener("storage", handleStorage);
+    window.addEventListener("storage", handleAuthChanged);
+    window.addEventListener("auth:changed", handleAuthChanged);
     return () => {
-      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("storage", handleAuthChanged);
+      window.removeEventListener("auth:changed", handleAuthChanged);
     };
   }, []);
 
