@@ -15,6 +15,7 @@ import {
 import SaveIcon from "@mui/icons-material/Save";
 import type { UserModel } from "../../models/user-model";
 import { getTranslations, type Language } from "../../i18n";
+import { api } from "../../services/api";
 
 interface SettingsPreferencesSectionProps {
   user: UserModel;
@@ -40,12 +41,23 @@ export function SettingsPreferencesSection({ user, onUpdate, language, onLanguag
   const handleSave = async () => {
     if (!onUpdate) return;
     setIsSaving(true);
-    await Promise.resolve(); // simula async
-    onUpdate({
-      ...user,
-      preferences: { language, theme, timezone, notifications }
-    });
-    setIsSaving(false);
+    const updatedPreferences = { language, theme, timezone, notifications };
+    try {
+      await api.put("/auth/preferences", {
+        theme,
+        notifications,
+        language,
+        timezone
+      });
+      onUpdate({
+        ...user,
+        preferences: updatedPreferences
+      });
+    } catch (error) {
+      console.error("Error updating preferences", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

@@ -11,6 +11,7 @@ import {
 import UploadIcon from "@mui/icons-material/Upload";
 import SaveIcon from "@mui/icons-material/Save";
 import { getTranslations, type Language } from "../../i18n";
+import { api } from "../../services/api";
 
 interface SettingsUserSectionProps {
   user: UserModel;
@@ -47,17 +48,24 @@ export function SettingsUserSection({ user, onUpdate, language }: SettingsUserSe
   const handleSave = async () => {
     if (!onUpdate) return;
     setIsSaving(true);
-    // Puedes hacer aquí un fetch/axios PUT real al backend si quieres
-    // Por ahora solo mock:
     const updatedUser: UserModel = {
       ...user,
       username,
       email,
       avatar
     };
-    await Promise.resolve(); // Mock async
-    onUpdate(updatedUser);
-    setIsSaving(false);
+    try {
+      await api.put("/auth/me", {
+        username,
+        email,
+        avatar
+      });
+      onUpdate(updatedUser);
+    } catch (error) {
+      console.error("Error updating user", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
