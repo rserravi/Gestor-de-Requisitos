@@ -56,6 +56,18 @@ const priorityColors: Record<RequirementModel['priority'], 'default' | 'primary'
   wont: "default"
 };
 
+const categoryCodes: Record<RequirementModel['category'], string> = {
+  functional: 'FN',
+  performance: 'PE',
+  usability: 'US',
+  security: 'SC',
+  technical: 'TH',
+};
+
+function formatRequirementId(category: RequirementModel['category'], number: number) {
+  return `REQ-${categoryCodes[category]}-${number.toString().padStart(3, '0')}`;
+}
+
 export function RequirementsTable({
   collapsed,
   onToggleCollapse,
@@ -106,7 +118,7 @@ export function RequirementsTable({
     let filtered = requirements.filter((req) => {
       const matchesText = textFilter === "" ||
         req.description.toLowerCase().includes(textFilter.toLowerCase()) ||
-        `REQ-${req.number.toString().padStart(3, '0')}`.toLowerCase().includes(textFilter.toLowerCase());
+        formatRequirementId(req.category, req.number).toLowerCase().includes(textFilter.toLowerCase());
 
       const matchesStatus = statusFilter === "all" || req.status === statusFilter;
       const matchesCategory = categoryFilter === "all" || req.category === categoryFilter;
@@ -202,10 +214,6 @@ export function RequirementsTable({
     setStatusFilter("all");
     setCategoryFilter("all");
     setPriorityFilter("all");
-  };
-
-  const formatRequirementId = (number: number) => {
-    return `REQ-${number.toString().padStart(3, '0')}`;
   };
 
   return (
@@ -388,10 +396,10 @@ export function RequirementsTable({
                 </TableRow>
               ) : (
                 filteredRequirements.map((requirement) => (
-                  <TableRow key={requirement.id} hover>
+                    <TableRow key={requirement.id} hover>
                     <TableCell>
                       <Typography fontFamily="monospace" fontWeight={500}>
-                        {formatRequirementId(requirement.number)}
+                        {formatRequirementId(requirement.category, requirement.number)}
                       </Typography>
                     </TableCell>
                     <TableCell>
