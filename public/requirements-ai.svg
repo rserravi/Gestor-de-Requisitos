@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" role="img" aria-label="Requirements AI - hexágono con degradado" viewBox="0 0 24 24">
+  <defs>
+    <!-- Degradado lineal naranja -->
+    <linearGradient id="gradHex" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffcc80"/>
+      <stop offset="100%" stop-color="#fb8c00"/>
+    </linearGradient>
+  </defs>
+  <!-- Líneas -->
+  <g fill="none" stroke="#1976d2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 7.2H4M8 11.2H4M11 15.2H3.8"/>
+  </g>
+  <!-- Hexágono con relleno degradado y borde azul oscuro -->
+  <path d="M13.5 6.2 18 8.7v5l-4.5 2.5L9 13.7v-5L13.5 6.2z"
+        fill="url(#gradHex)"
+        stroke="#1565c0"
+        stroke-width="1.75"
+        stroke-linejoin="round"/>
+</svg>
