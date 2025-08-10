@@ -15,8 +15,7 @@ import { getTranslations, type Language } from "../i18n";
 import type { MessageModel } from "../models/message-model";
 import { useStateMachine } from "../context/StateMachineContext";
 import type { ChatMessageCreatePayload } from "../services/chat-service";
-import { fetchConfigFiles, fetchFileRequirements } from "../services/config-files-service";
-import type { ConfigFile } from "../services/config-files-service";
+import { fetchConfigFiles, fetchFileRequirements, type ConfigFile } from "../services/file-service";
 
 interface ChatAreaProps {
   chatMessages: MessageModel[];
@@ -66,7 +65,7 @@ export function ChatArea({
   useEffect(() => {
     async function loadConfigFiles() {
       try {
-        const files = await fetchConfigFiles(projectId);
+        const files = await fetchConfigFiles();
         setUploadedConfigFiles(files);
       } catch {
         /* empty */

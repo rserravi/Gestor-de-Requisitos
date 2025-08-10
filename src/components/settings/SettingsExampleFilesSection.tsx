@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
     Box,
     Typography,
@@ -13,7 +13,7 @@ import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import type { UserModel, ExampleFile } from "../../models/user-model";
 import { getTranslations, type Language } from "../../i18n";
-import { uploadConfigFile } from "../../services/file-service";
+import { uploadConfigFile, fetchConfigFiles } from "../../services/file-service";
 
 interface SettingsExampleFilesSectionProps {
     user: UserModel;
@@ -21,7 +21,7 @@ interface SettingsExampleFilesSectionProps {
     language: Language;
 }
 
-export function SettingsExampleFilesSection({ user, onUpdate, language }: SettingsExampleFilesSectionProps) {
+export function SettingsExampleFilesSection({ user, onUpdate: _onUpdate, language }: SettingsExampleFilesSectionProps) {
     const [files, setFiles] = useState<ExampleFile[]>(user.exampleFiles?.files ?? []);
     const [prefered, setPrefered] = useState(user.exampleFiles?.prefered ?? "");
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -29,12 +29,27 @@ export function SettingsExampleFilesSection({ user, onUpdate, language }: Settin
 
     const fileNameById = (id: string) => files.find(f => f.id === id)?.name || id;
 
+    useEffect(() => {
+        async function loadFiles() {
+            try {
+                const fetched = await fetchConfigFiles();
+                const mapped = fetched.map(f => ({ id: String(f.id), name: f.name }));
+                setFiles(mapped);
+                setPrefered(prev => prev || mapped[0]?.id || "");
+            } catch {
+                /* empty */
+            }
+        }
+        loadFiles();
+    }, []);
+
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         const uploaded = await uploadConfigFile(file);
-        setFiles(prev => [...prev, uploaded]);
-        if (files.length === 0) setPrefered(uploaded.id);
+        const newFile = { id: String(uploaded.id), name: uploaded.name };
+        setFiles(prev => [...prev, newFile]);
+        if (files.length === 0) setPrefered(newFile.id);
         e.target.value = "";
     };
 
