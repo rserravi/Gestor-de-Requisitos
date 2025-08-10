@@ -22,9 +22,13 @@ export type UserPreferences = {
     timezone: string;
 };
 
+export type ExampleFile = {
+    id: string;
+    name: string;
+}
+
 export type ExampleFiles = {
-    files: string[];
-    filesId?: number[];
+    files: ExampleFile[];
     prefered: string;
     lastUpdated: Date;
 }
