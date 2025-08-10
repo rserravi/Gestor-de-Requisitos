@@ -1,69 +1,76 @@
-# React + TypeScript + Vite
+# Gestor de Requisitos – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este repositorio contiene la interfaz web del **Gestor de Requisitos**, una aplicación pensada para capturar, analizar y mejorar requisitos de software con asistencia de IA.
 
-Currently, two official plugins are available:
+## 💡 Características
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Formulario para capturar requisitos y enviarlos al backend.
+- Visualización y edición de requisitos existentes.
+- Análisis automático de requisitos utilizando modelos de IA.
+- Autenticación de usuarios mediante JWT.
+- Integración con el [backend del proyecto](https://github.com/rserravi/Gestor-de-Requisitos-Back).
 
-## Expanding the ESLint configuration
+## 🛠️ Requisitos para el desarrollo
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [Node.js](https://nodejs.org/) 18 o superior.
+- [pnpm](https://pnpm.io/) o npm como administrador de paquetes.
+- Backend en ejecución desde el repositorio [Gestor-de-Requisitos-Back](https://github.com/rserravi/Gestor-de-Requisitos-Back).
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 📁 Configuración del entorno
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+1. Clona este repositorio y entra en la carpeta del proyecto:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+   ```bash
+   git clone https://github.com/rserravi/Gestor-de-Requisitos.git
+   cd Gestor-de-Requisitos
+   ```
+
+2. Instala las dependencias del frontend:
+
+   ```bash
+   pnpm install
+   ```
+
+   > Puedes usar `npm install` si no tienes `pnpm`.
+
+3. Copia el archivo de variables de entorno de ejemplo y ajústalo:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   - Establece la URL del backend, por ejemplo:
+
+     ```env
+     VITE_API_URL=http://localhost:8000
+     ```
+
+4. Inicia la aplicación en modo desarrollo:
+
+   ```bash
+   pnpm dev
+   ```
+
+   La aplicación estará disponible en `http://localhost:5173` por defecto.
+
+5. Asegúrate de que el backend está ejecutándose localmente siguiendo las instrucciones del repositorio [Gestor-de-Requisitos-Back](https://github.com/rserravi/Gestor-de-Requisitos-Back).
+
+## 💾 Scripts disponibles
+
+- `pnpm dev`: Ejecuta el servidor de desarrollo con recarga automática.
+- `pnpm build`: Genera la versión de producción del frontend.
+- `pnpm preview`: Sirve localmente el build de producción para pruebas.
+- `pnpm lint`: Ejecuta ESLint para mantener un estilo de código consistente.
+
+## ♻️ Formato y estilo de código
+
+Este proyecto utiliza [Prettier](https://prettier.io/) para formateo y [ESLint](https://eslint.org/) para detección de problemas en el código. Antes de enviar cambios:
+
+```bash
+npx prettier . --write
+pnpm lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 📝 Licencia
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Este proyecto se distribuye bajo la licencia [MIT](LICENSE).
