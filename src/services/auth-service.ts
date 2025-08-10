@@ -49,9 +49,14 @@ export async function login({
       headers: { "Content-Type": "application/x-www-form-urlencoded" }
     });
 
-    localStorage.setItem("access_token", data.access_token);
+    const token = typeof data?.access_token === "string" ? data.access_token.trim() : "";
+    if (!token) {
+      throw new Error("Token no recibido");
+    }
+
+    localStorage.setItem("access_token", token);
     window.dispatchEvent(new CustomEvent("auth:changed"));
-    return data;
+    return { ...data, access_token: token };
   } catch (error) {
     const err = error as AxiosError<{ detail?: string }>;
     const message = err.response?.data?.detail ?? err.message ?? "Error al iniciar sesión";

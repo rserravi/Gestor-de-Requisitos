@@ -40,12 +40,7 @@ export function LoginPage() {
         if (!username || !password) { setError(t.errorUserPasswordRequired); return; }
         await login({ username, password });
         setError("");
-        const token = localStorage.getItem("access_token");
-        if (token) {
-          navigate("/");
-        } else {
-          setError(t.errorMissingToken ?? "Missing access token");
-        }
+        navigate("/");
       }
     } catch (err: any) {
       if (axios.isAxiosError(err)) {
