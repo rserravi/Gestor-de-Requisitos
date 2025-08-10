@@ -61,6 +61,17 @@ Este repositorio contiene la interfaz web del **Gestor de Requisitos**, una apli
 - `pnpm build`: Genera la versión de producción del frontend.
 - `pnpm preview`: Sirve localmente el build de producción para pruebas.
 - `pnpm lint`: Ejecuta ESLint para mantener un estilo de código consistente.
+- `pnpm test`: Ejecuta la suite de pruebas con Vitest.
+
+## 🧪 Ejecución de tests
+
+Para correr los tests en modo consola:
+
+```bash
+pnpm test
+```
+
+> Puedes usar `npm test` si no tienes `pnpm`.
 
 ## ♻️ Formato y estilo de código
 
