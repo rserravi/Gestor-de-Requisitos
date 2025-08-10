@@ -11,11 +11,9 @@ import UploadIcon from "@mui/icons-material/Upload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
-import type { UserModel } from "../../models/user-model";
+import type { UserModel, ExampleFile } from "../../models/user-model";
 import { getTranslations, type Language } from "../../i18n";
-
-// Utilidad para mostrar nombre legible a partir de ID (ajusta según tu backend)
-const fileNameById = (id: string) => `Ejemplo_${id.slice(-5)}.pdf`;
+import { uploadConfigFile } from "../../services/file-service";
 
 interface SettingsExampleFilesSectionProps {
     user: UserModel;
@@ -24,25 +22,27 @@ interface SettingsExampleFilesSectionProps {
 }
 
 export function SettingsExampleFilesSection({ user, onUpdate, language }: SettingsExampleFilesSectionProps) {
-    const [files, setFiles] = useState(user.exampleFiles?.files ?? []);
+    const [files, setFiles] = useState<ExampleFile[]>(user.exampleFiles?.files ?? []);
     const [prefered, setPrefered] = useState(user.exampleFiles?.prefered ?? "");
     const fileInputRef = useRef<HTMLInputElement>(null);
     const t = getTranslations(language);
 
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileNameById = (id: string) => files.find(f => f.id === id)?.name || id;
+
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
-        const newId = `file_${Date.now()}`;
-        setFiles(prev => [...prev, newId]);
-        if (files.length === 0) setPrefered(newId);
+        const uploaded = await uploadConfigFile(file);
+        setFiles(prev => [...prev, uploaded]);
+        if (files.length === 0) setPrefered(uploaded.id);
         e.target.value = "";
     };
 
     const handleFileDelete = (id: string) => {
-        const newFiles = files.filter(f => f !== id);
+        const newFiles = files.filter(f => f.id !== id);
         setFiles(newFiles);
         if (prefered === id) {
-            setPrefered(newFiles[0] || "");
+            setPrefered(newFiles[0]?.id || "");
         }
         // Actualiza backend si hace falta
     };
@@ -72,7 +72,7 @@ export function SettingsExampleFilesSection({ user, onUpdate, language }: Settin
                 )}
                 {files.map(f => (
                     <Paper
-                        key={f}
+                        key={f.id}
                         elevation={1}
                         sx={{
                             display: "flex",
@@ -80,24 +80,24 @@ export function SettingsExampleFilesSection({ user, onUpdate, language }: Settin
                             gap: 2,
                             p: 1.2,
                             pl: 2,
-                            bgcolor: prefered === f ? "action.selected" : "background.paper"
+                            bgcolor: prefered === f.id ? "action.selected" : "background.paper"
                         }}
                     >
                         <IconButton
-                            color={prefered === f ? "warning" : "default"}
-                            onClick={() => setPrefered(f)}
+                            color={prefered === f.id ? "warning" : "default"}
+                            onClick={() => handleSetPrefered(f.id)}
                             title={t.settingsFilesMarkFavorite}
                             size="small"
                             sx={{ mr: 1 }}
                         >
-                            {prefered === f ? <StarIcon /> : <StarBorderIcon />}
+                            {prefered === f.id ? <StarIcon /> : <StarBorderIcon />}
                         </IconButton>
                         <Typography variant="body2" sx={{ flex: 1 }}>
-                            {fileNameById(f)}
+                            {fileNameById(f.id)}
                         </Typography>
                         <IconButton
                             color="error"
-                            onClick={() => handleFileDelete(f)}
+                            onClick={() => handleFileDelete(f.id)}
                             title={t.settingsFilesDelete}
                             size="small"
                         >

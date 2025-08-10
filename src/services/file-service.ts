@@ -1,5 +1,6 @@
 // services/file-service.ts
 import { api } from "./api";
+import type { ExampleFile } from "../models/user-model";
 
 export interface ConfigFile {
   id: number;
