@@ -6,6 +6,13 @@ type Translations = {
 
 const translations: Record<Language, Translations> = {
   en: {
+    // App
+    processingResponse: "Your response is being processed by the AI.",
+    processingWait: "It may take up to a minute. Please wait...",
+    errorLoadMessages: "Failed to load messages.",
+    errorSendMessage: "Failed to send the message.",
+    errorAnalyzeAI: "Failed to analyze with AI.",
+
     // ChatArea
     chatTitle: "AI Assistant",
     aiInitialMessage: "Hello! How can I help you with your project requirements today?",
@@ -54,6 +61,10 @@ const translations: Record<Language, Translations> = {
     saveChanges: "Save Changes",
     cancelEdit: "Cancel Edit",
     viewVisual: "View Visual Reference",
+    errorLoadRequirements: "Failed to load requirements",
+    errorUpdateRequirement: "Failed to update requirement",
+    errorDeleteRequirement: "Failed to delete requirement",
+    errorCreateRequirement: "Failed to create requirement",
     status: {
       draft: "Draft",
       'in-review': "In Review",
@@ -81,11 +92,26 @@ const translations: Record<Language, Translations> = {
     addProject: "Add Project",
     settings: "Settings",
     logout: "Logout",
+    // SideMenu - New Project Modal
+    newProjectTitle: "Add new project",
+    newProjectNameLabel: "Project name",
+    newProjectDescriptionLabel: "Description",
+    newProjectCancel: "Cancel",
+    newProjectSaving: "Saving...",
+    newProjectCreate: "Create project",
+    errorProjectNameRequired: "Name is required",
+    errorCreateProject: "Error creating project",
 
     // Header
     headerTitle: "Requirements Manager - {activeProject}",
     toggleMenu: "Toggle menu",
     selectLanguage: "Select language",
+    // Languages
+    languages: {
+      en: "English",
+      es: "Spanish",
+      ca: "Catalan",
+    },
 
     // Settings Page
     settingsTitle: "Settings",
@@ -140,6 +166,13 @@ const translations: Record<Language, Translations> = {
     loginLink: "Login",
   },
   es: {
+    // App
+    processingResponse: "Su respuesta está siendo procesada por la IA.",
+    processingWait: "Podría tardar hasta un minuto. Por favor, espere...",
+    errorLoadMessages: "No se pudieron cargar los mensajes.",
+    errorSendMessage: "No se pudo enviar el mensaje.",
+    errorAnalyzeAI: "No se pudo analizar con IA.",
+
     // ChatArea
     chatTitle: "Asistente IA",
     aiInitialMessage: "¡Hola! ¿Cómo puedo ayudarte con los requisitos de tu proyecto hoy?",
@@ -188,6 +221,10 @@ const translations: Record<Language, Translations> = {
     saveChanges: "Guardar Cambios",
     cancelEdit: "Cancelar Edición",
     viewVisual: "Ver Referencia Visual",
+    errorLoadRequirements: "No se pudieron cargar los requisitos",
+    errorUpdateRequirement: "No se pudo actualizar el requisito",
+    errorDeleteRequirement: "No se pudo eliminar el requisito",
+    errorCreateRequirement: "No se pudo crear el requisito",
     status: {
       draft: "Borrador",
       'in-review': "En Revisión",
@@ -215,11 +252,26 @@ const translations: Record<Language, Translations> = {
     addProject: "Añadir Proyecto",
     settings: "Configuración",
     logout: "Cerrar Sesión",
+    // SideMenu - New Project Modal
+    newProjectTitle: "Añadir nuevo proyecto",
+    newProjectNameLabel: "Nombre del proyecto",
+    newProjectDescriptionLabel: "Descripción",
+    newProjectCancel: "Cancelar",
+    newProjectSaving: "Guardando...",
+    newProjectCreate: "Crear proyecto",
+    errorProjectNameRequired: "El nombre es obligatorio",
+    errorCreateProject: "Error al crear el proyecto",
 
     // Header
     headerTitle: "Gestor de Requisitos - {activeProject}",
     toggleMenu: "Abrir/cerrar menú",
     selectLanguage: "Seleccionar idioma",
+    // Languages
+    languages: {
+      en: "Inglés",
+      es: "Español",
+      ca: "Catalán",
+    },
 
     // Settings Page
     settingsTitle: "Configuración",
@@ -274,6 +326,13 @@ const translations: Record<Language, Translations> = {
     loginLink: "Inicia sesión",
   },
   ca: {
+    // App
+    processingResponse: "La teva resposta està sent processada per la IA.",
+    processingWait: "Podria trigar fins a un minut. Si us plau, espera...",
+    errorLoadMessages: "No s'han pogut carregar els missatges.",
+    errorSendMessage: "No s'ha pogut enviar el missatge.",
+    errorAnalyzeAI: "No s'ha pogut analitzar amb IA.",
+
     // ChatArea
     chatTitle: "Assistent IA",
     aiInitialMessage: "Hola! Com puc ajudar-te amb els requisits del teu projecte avui?",
@@ -322,6 +381,10 @@ const translations: Record<Language, Translations> = {
     saveChanges: "Desar Canvis",
     cancelEdit: "Cancel·lar Edició",
     viewVisual: "Veure Referència Visual",
+    errorLoadRequirements: "No s'han pogut carregar els requisits",
+    errorUpdateRequirement: "No s'ha pogut actualitzar el requisit",
+    errorDeleteRequirement: "No s'ha pogut eliminar el requisit",
+    errorCreateRequirement: "No s'ha pogut crear el requisit",
     status: {
       draft: "Esborrany",
       'in-review': "En Revisió",
@@ -349,11 +412,26 @@ const translations: Record<Language, Translations> = {
     addProject: "Afegir Projecte",
     settings: "Configuració",
     logout: "Tancar Sessió",
+    // SideMenu - New Project Modal
+    newProjectTitle: "Afegir nou projecte",
+    newProjectNameLabel: "Nom del projecte",
+    newProjectDescriptionLabel: "Descripció",
+    newProjectCancel: "Cancel·lar",
+    newProjectSaving: "Desant...",
+    newProjectCreate: "Crear projecte",
+    errorProjectNameRequired: "El nom és obligatori",
+    errorCreateProject: "Error en crear el projecte",
 
     // Header
     headerTitle: "Gestor de Requisits - {activeProject}",
     toggleMenu: "Obrir/tancar menú",
     selectLanguage: "Seleccionar idioma",
+    // Languages
+    languages: {
+      en: "Anglès",
+      es: "Espanyol",
+      ca: "Català",
+    },
 
     // Settings Page
     settingsTitle: "Configuració",

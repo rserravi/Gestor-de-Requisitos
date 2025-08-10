@@ -5,6 +5,7 @@ import { Header } from "./components/Header";
 import { SideMenu } from "./components/SideMenu";
 import { ChatArea } from "./components/ChatArea";
 import { RequirementsTable } from "./components/RequirementsTable";
+import { getTranslations, type Language } from "./i18n";
 import type { ProjectModel } from "./models/project-model";
 import type { UserModel } from "./models/user-model";
 import { SettingsPage } from "./pages/SettingsPage";
@@ -25,6 +26,7 @@ interface AppProps {
 export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [language, setLanguage] = useState("es");
+  const t = getTranslations(language as Language);
   const [user, setUser] = useState<UserModel | null>(null);
   const [loadingUser, setLoadingUser] = useState(true);
 
@@ -133,7 +135,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
     } catch (e: any) {
       // Si fue 401, el interceptor ya navegó; aquí solo limpiamos estado local
       setChatMessages([]);
-      setErrorChat("No se pudieron cargar los mensajes.");
+      setErrorChat(t.errorLoadMessages);
     } finally {
       setLoadingChat(false);
     }
@@ -150,7 +152,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
       await sendMessage(msg);
       await reloadMessages();
     } catch (e: any) {
-      setErrorChat("No se pudo enviar el mensaje.");
+      setErrorChat(t.errorSendMessage);
     } finally {
       setLoadingChat(false);
     }
@@ -176,7 +178,7 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
       // Recarga mensajes (sincroniza state también)
       await reloadMessages();
     } catch (e) {
-      setErrorChat("No se pudo analizar con IA.");
+      setErrorChat(t.errorAnalyzeAI);
     } finally {
       setLoadingChat(false);
     }
@@ -272,10 +274,10 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
                   >
                     <CircularProgress color="inherit" sx={{ mb: 2 }} />
                     <Typography variant="h6">
-                      Su respuesta está siendo procesada por la IA.
+                      {t.processingResponse}
                     </Typography>
                     <Typography variant="body2" color="inherit" sx={{ mt: 1 }}>
-                      Podría tardar hasta un minuto. Por favor, espere...
+                      {t.processingWait}
                     </Typography>
                   </Backdrop>
 

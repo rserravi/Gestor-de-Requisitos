@@ -261,10 +261,10 @@ export function ChatArea({
                         color="primary"
                         size="small"
                         disabled={loading}
-                        onClick={() => console.log("Añadir R. Funcionales")}
+                        onClick={() => console.log(t.chatStallAddFunctional)}
                         sx={{ whiteSpace: "nowrap" }}
                       >
-                        Añadir R. Funcionales
+                        {t.chatStallAddFunctional}
                       </Button>
 
                       <Button
@@ -276,7 +276,7 @@ export function ChatArea({
                         disabled={loading}
                         sx={{ whiteSpace: "nowrap" }}
                       >
-                        Añadir R. No Funcionales
+                        {t.chatStallAddNonFunctional}
                       </Button>
                       <Menu
                         anchorEl={anchorEl}
@@ -284,10 +284,10 @@ export function ChatArea({
                         onClose={handleCloseMenu}
                         MenuListProps={{ dense: true }}
                       >
-                        <MenuItem onClick={() => { console.log("performance"); handleCloseMenu(); }}>Performance</MenuItem>
-                        <MenuItem onClick={() => { console.log("usability"); handleCloseMenu(); }}>Usability</MenuItem>
-                        <MenuItem onClick={() => { console.log("security"); handleCloseMenu(); }}>Security</MenuItem>
-                        <MenuItem onClick={() => { console.log("technical"); handleCloseMenu(); }}>Technical</MenuItem>
+                        <MenuItem onClick={() => { console.log("performance"); handleCloseMenu(); }}>{t.category.performance}</MenuItem>
+                        <MenuItem onClick={() => { console.log("usability"); handleCloseMenu(); }}>{t.category.usability}</MenuItem>
+                        <MenuItem onClick={() => { console.log("security"); handleCloseMenu(); }}>{t.category.security}</MenuItem>
+                        <MenuItem onClick={() => { console.log("technical"); handleCloseMenu(); }}>{t.category.technical}</MenuItem>
                       </Menu>
                     </Stack>
                   </Box>
