@@ -31,6 +31,7 @@ describe("auth-service", () => {
       value: localStorageMock,
       configurable: true
     });
+    vi.spyOn(window.navigator, "language", "get").mockReturnValue("es-ES");
     vi.clearAllMocks();
   });
 
