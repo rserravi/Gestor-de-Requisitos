@@ -39,6 +39,7 @@ const translations: Record<Language, Translations> = {
     // RequirementsTable
     requirementsTableTitle: "Requirements Table",
     addRequirement: "Add Requirement",
+    exportRequirements: "Export Requirements",
     newRequirementDescription: "New requirement",
     searchLabel: "Search",
     searchPlaceholder: "Search by description or ID (e.g., REQ-FN-001)...",
@@ -208,6 +209,7 @@ const translations: Record<Language, Translations> = {
     // RequirementsTable
     requirementsTableTitle: "Tabla de Requisitos",
     addRequirement: "Añadir Requisito",
+    exportRequirements: "Exportar Requisitos",
     newRequirementDescription: "Nuevo requisito",
     searchLabel: "Buscar",
     searchPlaceholder: "Buscar por descripción o ID (ej: REQ-FN-001)...",
@@ -378,6 +380,7 @@ const translations: Record<Language, Translations> = {
     // RequirementsTable
     requirementsTableTitle: "Taula de Requisits",
     addRequirement: "Afegir Requisit",
+    exportRequirements: "Exportar Requisits",
     newRequirementDescription: "Nou requisit",
     searchLabel: "Cercar",
     searchPlaceholder: "Cerca per descripció o ID (ex: REQ-FN-001)...",

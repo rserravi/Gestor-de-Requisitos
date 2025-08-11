@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { RequirementsTable } from "../RequirementsTable";
 import type { RequirementModel } from "../../models/requirements-model";
+import { StateMachineProvider } from "../../context/StateMachineContext";
 
 vi.mock("../../services/requirements-service", () => ({
   fetchProjectRequirements: vi.fn(),
@@ -50,13 +51,15 @@ const requirements: RequirementModel[] = [
 
 function renderTable() {
   return render(
-    <RequirementsTable
-      collapsed={false}
-      onToggleCollapse={() => {}}
-      language="en"
-      projectId={1}
-      ownerId={1}
-    />
+    <StateMachineProvider>
+      <RequirementsTable
+        collapsed={false}
+        onToggleCollapse={() => {}}
+        language="en"
+        projectId={1}
+        ownerId={1}
+      />
+    </StateMachineProvider>
   );
 }
 
