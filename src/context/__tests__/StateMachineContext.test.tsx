@@ -24,12 +24,13 @@ describe('StateMachineContext', () => {
   beforeEach(() => {
     vi.resetModules();
     originalEnv = import.meta.env.VITE_ENV;
+    vi.spyOn(window.navigator, 'language', 'get').mockReturnValue('es-ES');
   });
 
   afterEach(() => {
     import.meta.env.VITE_ENV = originalEnv;
+    vi.restoreAllMocks();
     vi.unstubAllGlobals();
-    vi.clearAllMocks();
   });
 
   it('initializes with new_requisites and persists state in debug mode', async () => {
