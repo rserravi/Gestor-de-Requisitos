@@ -170,10 +170,12 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
         setSmState // sincroniza state machine con último mensaje
       );
       setChatMessages(messages);
+      return messages;
     } catch {
       // Si fue 401, el interceptor ya navegó; aquí solo limpiamos estado local
       setChatMessages([]);
       setErrorChat(t.errorLoadMessages);
+      return [] as MessageModel[];
     } finally {
       setLoadingChat(false);
     }
@@ -217,8 +219,20 @@ export default function App({ isDarkMode, onToggleDarkMode }: AppProps) {
       // Opcional: reflejar de inmediato
       setSmState("analyze_requisites");
 
-      // Recarga mensajes (sincroniza state también)
-      await reloadMessages();
+      // Recarga mensajes (sincroniza state también) y revisa resultado
+      const messages = await reloadMessages();
+      const lastMessage = messages[messages.length - 1];
+
+      if (
+        !lastMessage?.content.includes("?") ||
+        lastMessage?.state === "analyze_requisites"
+      ) {
+        await addStateMachineEntry(activeProject.id, "stall");
+        setSmState("stall");
+        alert(
+          "No se generaron preguntas. Puedes continuar añadiendo requisitos manualmente."
+        );
+      }
     } catch {
       setErrorChat(t.errorAnalyzeAI);
     } finally {
