@@ -107,11 +107,12 @@ export function RequirementsTable({
   // o cuando un componente padre indica que se deben recargar
   useEffect(() => {
     setLoading(true);
+    const errorText = getTranslations(language).errorLoadRequirements;
     fetchProjectRequirements(projectId)
       .then(setRequirements)
-      .catch(() => setError(t.errorLoadRequirements))
+      .catch(() => setError(errorText))
       .finally(() => setLoading(false));
-  }, [projectId, reloadTrigger, t.errorLoadRequirements]);
+  }, [projectId, reloadTrigger, language]);
 
   // Filtrado + ordenación de requisitos
   const filteredRequirements = useMemo(() => {
