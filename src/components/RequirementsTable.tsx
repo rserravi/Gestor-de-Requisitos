@@ -17,9 +17,11 @@ import {
   ExpandMore,
   List as TableIcon,
   ArrowUpward,
-  ArrowDownward
+  ArrowDownward,
+  Download as DownloadIcon
 } from "@mui/icons-material";
 import { getTranslations, type Language } from "../i18n";
+import { useStateMachine } from "../context/StateMachineContext";
 import type { RequirementModel } from "../models/requirements-model";
 import {
   fetchProjectRequirements,
@@ -77,6 +79,7 @@ export function RequirementsTable({
   reloadTrigger = 0,
 }: RequirementsTableProps) {
   const t = getTranslations(language);
+  const { state: smState } = useStateMachine();
   const [requirements, setRequirements] = useState<RequirementModel[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -217,6 +220,25 @@ export function RequirementsTable({
     setPriorityFilter("all");
   };
 
+  const exportRequirements = () => {
+    const content = requirements
+      .map(req => {
+        const id = formatRequirementId(req.category, req.number);
+        const desc = req.description.replace(/\n/g, " ");
+        const cat = t.category[req.category];
+        return `${id} - ${desc} - ${cat}`;
+      })
+      .join("\n");
+    const blob = new Blob([content], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "requisitos.txt";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  };
+
   return (
     <Paper elevation={3} sx={{ borderRadius: 2, p: 0, mb: 1, display: "flex", flexDirection: "column", height: collapsed ? "auto" : "100%" }}>
       {/* Header igual que ChatArea */}
@@ -241,6 +263,17 @@ export function RequirementsTable({
           >
             {t.addRequirement}
           </Button>
+          {smState === "stall" && (
+            <IconButton
+              onClick={exportRequirements}
+              size="small"
+              title={t.exportRequirements}
+              aria-label={t.exportRequirements}
+              disabled={requirements.length === 0}
+            >
+              <DownloadIcon fontSize="small" />
+            </IconButton>
+          )}
           <IconButton
             onClick={onToggleCollapse}
             size="small"
